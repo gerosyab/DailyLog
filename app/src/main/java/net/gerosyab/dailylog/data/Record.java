@@ -7,7 +7,6 @@ import org.joda.time.Duration;
  * Created by donghe on 2016-06-03.
  */
 public class Record {
-    int recordId;
     int categoryId;
     int recordType;
     DateTime dt;
