@@ -1,26 +1,57 @@
 package net.gerosyab.dailylog.data;
 
-import com.orm.SugarRecord;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.ModelContainer;
+import com.raizlabs.android.dbflow.annotation.OneToMany;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.annotation.Unique;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.structure.BaseModel;
+
+import net.gerosyab.dailylog.database.AppDatabase;
+
+import java.util.List;
 
 /**
  * Created by donghe on 2016-06-03.
  */
-public class Category extends SugarRecord {
-    String name;
-    String unit;
-    int order;
-    int recordType;
-    Statistic statistic;
+@Table(database = AppDatabase.class)
+public class Category extends BaseModel {
+    @Column
+    @PrimaryKey(autoincrement = true)
+    private long id;
+
+    @Column
+    @Unique
+    private String name;
+
+    @Column
+    private String unit;
+
+    @Column
+    private long order;
+
+    @Column
+    private long recordType;
 
     public Category() {
     }
 
-    public Category(String name, String unit, int order, int recordType) {
+    public Category(String name, String unit, long order, long  recordType) {
         this.name = name;
         this.unit = unit;
         this.order = order;
         this.recordType = recordType;
-        this.statistic = new Statistic();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -39,20 +70,21 @@ public class Category extends SugarRecord {
         this.unit = unit;
     }
 
-    public int getOrder() {
+    public long getOrder() {
         return order;
     }
 
-    public void setOrder(int order) {
+    public void setOrder(long order) {
         this.order = order;
     }
 
-    public int getRecordType() {
+    public long getRecordType() {
         return recordType;
     }
 
-    public void setRecordType(int recordType) {
+    public void setRecordType(long recordType) {
         this.recordType = recordType;
     }
+
 }
 

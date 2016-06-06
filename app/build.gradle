@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+def dbflow_version = "3.0.1"
 
 android {
     compileSdkVersion 23
@@ -26,5 +29,15 @@ dependencies {
     compile 'com.android.support:design:23.4.0'
     compile 'com.prolificinteractive:material-calendarview:1.4.0'
     compile 'joda-time:joda-time:2.9.4'
-    compile 'com.github.satyan:sugar:1.4'
+
+    apt "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
+    // use kapt for kotlin apt
+    compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
+    compile "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
+
+    // sql-cipher database encyrption (optional)
+    compile "com.github.Raizlabs.DBFlow:dbflow-sqlcipher:${dbflow_version}"
+
+    // kotlin extensions
+    compile "com.github.Raizlabs.DBFlow:dbflow-kotlinextensions:${dbflow_version}"
 }
