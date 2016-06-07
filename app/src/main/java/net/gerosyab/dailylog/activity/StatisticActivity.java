@@ -49,14 +49,16 @@ public class StatisticActivity extends AppCompatActivity {
 
             for(Field field : fields){
                 String str = field.getName();
+                String str2 = field.toGenericString();
                 field.setAccessible(true);
-                if(str.contains("text") || str.contains("month") || str.contains("Text") || str.contains("Month") || str.contains("Text") || str.contains("Month") ){
+                if(str2.contains("text") || str2.contains("month") || str2.contains("Text") || str2.contains("Month") || str2.contains("TEXT") || str2.contains("MONTH") ){
                     textView.setTextColor(Color.RED);
                 }
                 else{
                     textView.setTextColor(Color.BLACK);
                 }
-                textView.append("- " + field.getName() + "\r\n");
+                textView.append("- " + str + "\r\n");
+                textView.append("- " + str2 + "\r\n");
             }
 
         Intent intent = getIntent();
