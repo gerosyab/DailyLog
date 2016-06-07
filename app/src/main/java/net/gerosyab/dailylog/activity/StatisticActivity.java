@@ -19,8 +19,11 @@ import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.StaticData;
 import net.gerosyab.dailylog.data.Statistic;
 import net.gerosyab.dailylog.data.Statistic_Table;
+import net.gerosyab.dailylog.util.Util;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,9 +42,9 @@ public class StatisticActivity extends AppCompatActivity {
         setContentView(R.layout.activity_statistic);
 
         textView = (TextView) findViewById(R.id.testText);
-        textView.setText("test");
+        textView.setText("");
+        List<Field> fields = Util.getAllFields(new LinkedList<Field>(), CalendarView.class);
 
-            Field[] fields = CalendarView.class.getDeclaredFields();
             for(Field field : fields){
                 field.setAccessible(true);
                 textView.append("- " + field.getName() + "\r\n");
@@ -72,4 +75,5 @@ public class StatisticActivity extends AppCompatActivity {
             }
         });
     }
+
 }

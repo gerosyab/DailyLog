@@ -22,9 +22,11 @@ import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.Record_Table;
 import net.gerosyab.dailylog.data.StaticData;
+import net.gerosyab.dailylog.util.Util;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
@@ -43,17 +45,26 @@ public class DetailActivity extends AppCompatActivity {
         calendarView = (CalendarView) findViewById(R.id.calendarView);
 
         try {
-            Field field = CalendarView.class.getDeclaredField("mMonthName");
-            field.setAccessible(true);
-            monthTextView = (TextView) field.get(calendarView);
-            monthTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getApplicationContext(), "Month Text Clicked", Toast.LENGTH_SHORT).show();
+            List<Field> fields = Util.getAllFields(new LinkedList<Field>(), CalendarView.class);
+            Field mMonthTextField = null;
+            for(Field field : fields){
+                if(field.getName().equals("mMonthName")){
+                    mMonthTextField = field;
+                    mMonthTextField.setAccessible(true);
+                    break;
                 }
-            });
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            }
+            Toast.makeText(getApplicationContext(), "mMonthTextField : " + mMonthTextField, Toast.LENGTH_LONG).show();
+
+            if(mMonthTextField != null) {
+                monthTextView = (TextView) mMonthTextField.get(calendarView);
+                monthTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(), "Month Text Clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
