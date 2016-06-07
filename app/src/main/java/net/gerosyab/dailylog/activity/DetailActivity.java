@@ -37,7 +37,6 @@ public class DetailActivity extends AppCompatActivity {
         categoryID = intent.getLongExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, -1);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setImageResource(R.mipmap.ic_stat3);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
