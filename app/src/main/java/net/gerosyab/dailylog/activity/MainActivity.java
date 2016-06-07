@@ -59,11 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
+        toolbar.setNavigationIcon(R.drawable.ic_date_range_white_24dp);
+
         refreshList();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
-//        fab.setImageResource(R.mipmap.ic_stat2);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

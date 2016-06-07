@@ -165,16 +165,13 @@ public class CategoryActivity extends AppCompatActivity {
             categoryNameStr= categoryNameEditText.getText().toString();
 
             if(categoryNameStr.equalsIgnoreCase("")){
-                Snackbar.make(rootView, "Category Name must be specified", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Toast.makeText(getApplicationContext(), "Category Name must be specified", Toast.LENGTH_LONG).show();
                 return true;
             }else if(categoryNameStr.length() > 50){
-                Snackbar.make(rootView, "The maximum length of Category Name is 50 characters", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Toast.makeText(getApplicationContext(), "The maximum length of Category Name is 50 characters", Toast.LENGTH_LONG).show();
                 return true;
             }else if(isCategoryNameExists(categoryNameStr)){
-                Snackbar.make(rootView, "Category Name \"" + categoryNameStr + "\" already exists", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Toast.makeText(getApplicationContext(), "Category Name \"" + categoryNameStr + "\" already exists", Toast.LENGTH_LONG).show();
                 return true;
             }
 
@@ -183,12 +180,10 @@ public class CategoryActivity extends AppCompatActivity {
                 unitStr = categoryNameEditText.getText().toString();
 
                 if(unitStr.equalsIgnoreCase("")){
-                    Snackbar.make(rootView, "Unit must be specified if the record type is numeric", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Toast.makeText(getApplicationContext(), "Unit must be specified if the record type is numeric", Toast.LENGTH_LONG).show();
                     return true;
                 }else if(unitStr.length() > 20){
-                    Snackbar.make(rootView, "The maximum length of Unit is 20 characters", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Toast.makeText(getApplicationContext(), "The maximum length of Unit is 20 characters", Toast.LENGTH_LONG).show();
                     return true;
                 }
             }

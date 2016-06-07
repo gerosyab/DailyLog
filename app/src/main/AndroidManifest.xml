@@ -19,10 +19,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.DetailActivity">
+        <activity android:name=".activity.DetailActivity"
+            android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
         </activity>
 
         <activity android:name=".activity.CategoryActivity"
@@ -33,18 +37,16 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity" />
-
         </activity>
 
         <activity android:name=".activity.StatisticActivity"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".activity.CategoryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.CategoryActivity" />
-
         </activity>
 
     </application>
