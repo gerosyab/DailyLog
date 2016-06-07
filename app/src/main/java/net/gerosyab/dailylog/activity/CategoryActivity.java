@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -21,6 +22,8 @@ import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
 import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.StaticData;
+
+import java.util.List;
 
 public class CategoryActivity extends AppCompatActivity {
     long categoryMode;
@@ -33,7 +36,8 @@ public class CategoryActivity extends AppCompatActivity {
     String unitStr = "";
     long recordType;
     long categoryNum;
-    long categoryId;
+    long categoryID;
+    long categoryOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +55,8 @@ public class CategoryActivity extends AppCompatActivity {
         Intent intent = getIntent();
         categoryMode = intent.getLongExtra(StaticData.CATEGORY_MODE_INTENT_EXTRA, StaticData.CATEGORY_MODE_CREATE);
         categoryNum = intent.getLongExtra(StaticData.CATEGORY_NUM_INTENT_EXTRA, 0);
-        categoryId = intent.getLongExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, -1);
+        categoryID = intent.getLongExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, -1);
+        categoryOrder = intent.getLongExtra(StaticData.CATEGORY_ORDER_INTENT_EXTRA, 0);
 
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
@@ -95,51 +100,51 @@ public class CategoryActivity extends AppCompatActivity {
 
         //View Intialization
         if(categoryMode == StaticData.CATEGORY_MODE_CREATE){
-
+            category = new Category("", "", categoryOrder, StaticData.RECORD_TYPE_BOOLEAN);
             radioButton1.setChecked(true);
             radioButton2.setChecked(false);
             radioButton3.setChecked(false);
             unitTitleTextView.setEnabled(false);
             unitEditText.setEnabled(false);
             recordType = StaticData.RECORD_TYPE_BOOLEAN;
-            category.setRecordType(recordType);
+//            category.setRecordType(recordType);
         }
         else if(categoryMode == StaticData.CATEGORY_MODE_EDIT){
-            SQLite.select()
+            category = SQLite.select()
                     .from(Category.class)
-                    .where(Category_Table.id.is(categoryId))
-                    .async()
-                    .queryResultCallback(new QueryTransaction.QueryResultCallback<Category>() {
-                        @Override
-                        public void onQueryResult(QueryTransaction transaction, @NonNull CursorResult<Category> tResult) {
-                            category = tResult.toModelClose();
-                            categoryNameEditText.setText(category.getName());
-                            recordType = category.getRecordType();
-                            if(recordType == StaticData.RECORD_TYPE_BOOLEAN){
-                                radioButton1.setEnabled(true);
-                                radioButton2.setEnabled(false);
-                                radioButton3.setEnabled(false);
-                                unitTitleTextView.setEnabled(false);
-                                unitEditText.setEnabled(false);
-                            }
-                            else if(recordType == StaticData.RECORD_TYPE_NUMBER){
-                                radioButton1.setEnabled(false);
-                                radioButton2.setEnabled(true);
-                                radioButton3.setEnabled(false);
-                                unitTitleTextView.setText(category.getUnit());
-                                unitTitleTextView.setEnabled(true);
-                                unitEditText.setEnabled(true);
-                            }
-                            else if(recordType == StaticData.RECORD_TYPE_MEMO){
-                                radioButton1.setEnabled(false);
-                                radioButton2.setEnabled(false);
-                                radioButton3.setEnabled(true);
-                                unitTitleTextView.setEnabled(false);
-                                unitEditText.setEnabled(false);
-                            }
+                    .where(Category_Table.id.eq(categoryID))
+                    .querySingle();
 
-                        }
-                    });
+            if(category != null) {
+                categoryNameEditText.setText(category.getName());
+                recordType = category.getRecordType();
+
+                radioButton1.setEnabled(false);
+                radioButton2.setEnabled(false);
+                radioButton3.setEnabled(false);
+                unitTitleTextView.setEnabled(false);
+                unitEditText.setEnabled(false);
+
+                if (recordType == StaticData.RECORD_TYPE_BOOLEAN) {
+                    radioButton1.setChecked(true);
+                    radioButton2.setChecked(false);
+                    radioButton3.setChecked(false);
+                } else if (recordType == StaticData.RECORD_TYPE_NUMBER) {
+                    radioButton1.setChecked(false);
+                    radioButton2.setChecked(true);
+                    radioButton3.setChecked(false);
+                    unitTitleTextView.setText(category.getUnit());
+                    unitTitleTextView.setEnabled(true);
+                } else if (recordType == StaticData.RECORD_TYPE_MEMO) {
+                    radioButton1.setChecked(false);
+                    radioButton2.setChecked(false);
+                    radioButton3.setChecked(true);
+                }
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Can't find category \"" + category.getName() + "\"", Toast.LENGTH_LONG).show();
+                finish();
+            }
         }
     }
 
@@ -165,6 +170,10 @@ public class CategoryActivity extends AppCompatActivity {
                 return true;
             }else if(categoryNameStr.length() > 50){
                 Snackbar.make(rootView, "The maximum length of Category Name is 50 characters", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                return true;
+            }else if(isCategoryNameExists(categoryNameStr)){
+                Snackbar.make(rootView, "Category Name \"" + categoryNameStr + "\" already exists", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 return true;
             }
@@ -200,10 +209,23 @@ public class CategoryActivity extends AppCompatActivity {
 
             }
             category.save();
-
+            setResult(RESULT_OK);
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean isCategoryNameExists(String categoryNameStr){
+        List<Category> categories =SQLite.select(Category_Table.name)
+                        .from(Category.class)
+                        .queryList();
+        for(Category category : categories){
+            if(categoryNameStr.equals(category.getName())){
+                return true;
+            }
+        }
+        return false;
     }
 }

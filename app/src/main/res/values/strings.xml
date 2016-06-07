@@ -4,5 +4,10 @@
     <string name="action_export">Export</string>
     <string name="action_settings">Settings</string>
     <string name="action_save">SAVE</string>
+    <string name="action_edit">EDIT</string>
+    <string name="action_delete">DELETE</string>
     <string name="unitEditTextHint">time(s), minute, cup(s) ...</string>
+    <string name="confirm">CONFRIM</string>
+    <string name="cancel">CANCEL</string>
+    <string name="dialog_message_confirm_delete">Delete Category ??</string>
 </resources>
