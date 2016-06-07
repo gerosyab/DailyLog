@@ -1,6 +1,7 @@
 package net.gerosyab.dailylog.util;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,14 @@ public class Util {
             fields = getAllFields(fields, type.getSuperclass());
         }
 
+        return fields;
+    }
+
+    public static List<Field> getInheritedFields(Class<?> type) {
+        List<Field> fields = new ArrayList<Field>();
+        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+        }
         return fields;
     }
 }

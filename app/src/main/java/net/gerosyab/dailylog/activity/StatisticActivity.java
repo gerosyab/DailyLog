@@ -1,6 +1,7 @@
 package net.gerosyab.dailylog.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
@@ -43,10 +44,18 @@ public class StatisticActivity extends AppCompatActivity {
 
         textView = (TextView) findViewById(R.id.testText);
         textView.setText("");
-        List<Field> fields = Util.getAllFields(new LinkedList<Field>(), CalendarView.class);
+//        List<Field> fields = Util.getAllFields(new LinkedList<Field>(), CalendarView.class);
+        List<Field> fields = Util.getInheritedFields(CalendarView.class);
 
             for(Field field : fields){
+                String str = field.getName();
                 field.setAccessible(true);
+                if(str.contains("text") || str.contains("month") || str.contains("Text") || str.contains("Month") || str.contains("Text") || str.contains("Month") ){
+                    textView.setTextColor(Color.RED);
+                }
+                else{
+                    textView.setTextColor(Color.BLACK);
+                }
                 textView.append("- " + field.getName() + "\r\n");
             }
 

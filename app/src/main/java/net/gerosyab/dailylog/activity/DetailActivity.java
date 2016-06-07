@@ -45,10 +45,12 @@ public class DetailActivity extends AppCompatActivity {
         calendarView = (CalendarView) findViewById(R.id.calendarView);
 
         try {
-            List<Field> fields = Util.getAllFields(new LinkedList<Field>(), CalendarView.class);
+//            List<Field> fields = Util.getAllFields(new LinkedList<Field>(), CalendarView.class);
+            List<Field> fields = Util.getInheritedFields(CalendarView.class);
             Field mMonthTextField = null;
             for(Field field : fields){
-                if(field.getName().equals("mMonthName")){
+//                if(field.getName().equals("mMonthName")){
+                if(field.getName().equals("LOG_TAG")){
                     mMonthTextField = field;
                     mMonthTextField.setAccessible(true);
                     break;
@@ -57,13 +59,14 @@ public class DetailActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "mMonthTextField : " + mMonthTextField, Toast.LENGTH_LONG).show();
 
             if(mMonthTextField != null) {
-                monthTextView = (TextView) mMonthTextField.get(calendarView);
-                monthTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(getApplicationContext(), "Month Text Clicked", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                monthTextView = (TextView) mMonthTextField.get(calendarView);
+//                monthTextView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Toast.makeText(getApplicationContext(), "Month Text Clicked", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+                Toast.makeText(getApplicationContext(), (String) mMonthTextField.get(calendarView), Toast.LENGTH_SHORT).show();
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
