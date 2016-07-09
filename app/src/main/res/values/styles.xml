@@ -17,4 +17,37 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!-- Dark theme. -->
+    <style name="MyCaldroidTheme" parent="CaldroidDefault">
+        <item name="styleCaldroidViewLayout">@style/MyCaldroidCalendarViewLayout</item>
+        <item name="styleCaldroidMonthName">@style/MyCaldroidMonthName</item>
+        <item name="styleCaldroidNormalCell">@style/MyCaldroidNormalCell</item>
+        <item name="styleCaldroidSquareCell">@style/MyCaldroidSquareCell</item>
+        <item name="styleCaldroidGridView">@style/MyCaldroidGridView</item>
+    </style>
+
+    <style name="MyCaldroidCalendarViewLayout">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="MyCaldroidMonthName" parent="CaldroidDefaultMonthName">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="MyCaldroidGridView" parent="CaldroidDefaultGridView">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="MyCaldroidCell" parent="CaldroidDefaultCell">
+        <item name="android:textColor">@color/cell_text_color</item>
+        <item name="android:background">@drawable/date_cell_bg</item>
+    </style>
+
+    <style name="MyCaldroidNormalCell" parent="MyCaldroidCell">
+        <item name="android:padding">5dp</item>
+    </style>
+
+    <style name="MyCaldroidSquareCell" parent="MyCaldroidCell" >
+    </style>
+
 </resources>

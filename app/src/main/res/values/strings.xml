@@ -7,7 +7,7 @@
     <string name="action_edit">EDIT</string>
     <string name="action_delete">DELETE</string>
     <string name="unitEditTextHint">time(s), minute, cup(s) ...</string>
-    <string name="confirm">CONFRIM</string>
+    <string name="confirm">CONFIRM</string>
     <string name="cancel">CANCEL</string>
     <string name="dialog_message_confirm_delete">Delete Category ??</string>
 </resources>

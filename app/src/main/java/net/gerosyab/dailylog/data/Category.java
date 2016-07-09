@@ -12,11 +12,13 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import net.gerosyab.dailylog.database.AppDatabase;
 
+import java.sql.Date;
 import java.util.List;
 
 /**
  * Created by donghe on 2016-06-03.
  */
+@ModelContainer
 @Table(database = AppDatabase.class)
 public class Category extends BaseModel {
     @Column
@@ -35,6 +37,8 @@ public class Category extends BaseModel {
 
     @Column
     private long recordType;
+
+    List<Record> records;
 
     public Category() {
     }
@@ -86,5 +90,29 @@ public class Category extends BaseModel {
         this.recordType = recordType;
     }
 
+    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
+    public List<Record> getRecords() {
+        if (records == null || records.isEmpty()) {
+            records = SQLite.select()
+                    .from(Record.class)
+                    .where(Record_Table.category_id.eq(id))
+                    .queryList();
+        }
+        return records;
+    }
+
+    public boolean hasRecord(Date date){
+        List<Record> records = SQLite.select().from(Record.class).where(Record_Table.date.eq(date)).queryList();
+
+        if(records == null || records.isEmpty()){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public Record getRecord(Date date){
+        return SQLite.select().from(Record.class).where(Record_Table.date.eq(date)).querySingle();
+    }
 }
 

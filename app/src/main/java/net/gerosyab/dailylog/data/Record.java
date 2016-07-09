@@ -2,6 +2,7 @@ package net.gerosyab.dailylog.data;
 
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.annotation.Unique;
@@ -16,6 +17,7 @@ import java.sql.Date;
 /**
  * Created by donghe on 2016-06-03.
  */
+@ModelContainer
 @Table(database = AppDatabase.class)
 public class Record extends BaseModel{
     @Column
@@ -41,17 +43,11 @@ public class Record extends BaseModel{
     @Column
     private String string;
 
-    public void associateCategory(Category category) {
-        this.category = FlowManager.getContainerAdapter(Category.class)
-                .toForeignKeyContainer(category); // convenience conversion
-    }
-
     public Record(){
     }
 
-    public Record(long id, ForeignKeyContainer<Category> category, long recordType, Date date, boolean bool, long number, String string) {
-        this.id = id;
-        this.category = category;
+    public Record(Category category, long recordType, Date date, boolean bool, long number, String string) {
+        this.category =  FlowManager.getContainerAdapter(Category.class).toForeignKeyContainer(category);
         this.recordType = recordType;
         this.date = date;
         this.bool = bool;
@@ -67,11 +63,11 @@ public class Record extends BaseModel{
         this.id = id;
     }
 
-    public ForeignKeyContainer<Category> getCategory() {
+    public  ForeignKeyContainer<Category> getCategory() {
         return category;
     }
 
-    public void setCategory(ForeignKeyContainer<Category> category) {
+    public void setCategory( ForeignKeyContainer<Category> category) {
         this.category = category;
     }
 
@@ -113,5 +109,9 @@ public class Record extends BaseModel{
 
     public void setString(String string) {
         this.string = string;
+    }
+
+    public void associateCategory(Category category) {
+        this.category = FlowManager.getContainerAdapter(Category.class).toForeignKeyContainer(category);
     }
 }
