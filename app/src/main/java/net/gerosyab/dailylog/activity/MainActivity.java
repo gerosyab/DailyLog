@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        toolbar.setNavigationIcon(R.drawable.ic_date_range_white_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_home_white_24dp);
 
         refreshList();
 

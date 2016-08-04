@@ -15,13 +15,349 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-        <TextView
-            android:id="@+id/testText"
-            android:text="hello"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1.0dip"
+                android:layout_marginBottom="5.0dip"
+                android:background="#ff000000" />
+            <TextView
+                style="@style/statisticTitleText"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20.0dip"
+                android:text="Trend Analysis" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1.0dip"
+                android:layout_marginBottom="5.0dip"
+                android:background="#ff000000" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last 7 Days" />
+
+                <TextView
+                    android:id="@+id/last7DaysText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last 15 days" />
+
+                <TextView
+                    android:id="@+id/last15DaysText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last Month" />
+
+                <TextView
+                    android:id="@+id/lastMonthText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last 2 Months" />
+
+                <TextView
+                    android:id="@+id/last2MonthsText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last 3 Months" />
+
+                <TextView
+                    android:id="@+id/last3MonthsText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last 6 Months" />
+
+                <TextView
+                    android:id="@+id/last6MonthsText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last Year" />
+
+                <TextView
+                    android:id="@+id/lastYearText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1.0dip"
+                android:layout_marginTop="15.0dip"
+                android:background="#ff000000" />
+
+            <TextView
+                style="@style/statisticTitleText"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20.0dip"
+                android:text="Records" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1.0dip"
+                android:layout_marginBottom="5.0dip"
+                android:background="#ff000000" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Total Records" />
+
+                <TextView
+                    android:id="@+id/totalRecordsText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="0" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="First Recorded" />
+
+                <TextView
+                    android:id="@+id/firstRecordDateText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="None" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Last Recorded" />
+
+                <TextView
+                    android:id="@+id/lastRecordDateText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="None" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Average Value" />
+
+                <TextView
+                    android:id="@+id/averageText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="None" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="20.0dip"
+                android:paddingRight="20.0dip">
+
+                <TextView
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:gravity="left"
+                    android:text="Record Period" />
+
+                <TextView
+                    android:id="@+id/periodText"
+                    style="@style/statisticItemText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.0"
+                    android:gravity="right"
+                    android:text="None" />
+            </LinearLayout>
+        </LinearLayout>
     </ScrollView>
 </RelativeLayout>

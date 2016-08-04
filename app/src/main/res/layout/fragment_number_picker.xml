@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/minus_image"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|left"
+        android:gravity="center_vertical|left"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/minus_icon_black"/>
+
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/valueEidTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:gravity="center"
+            android:minWidth="120dp"
+            android:textSize="30sp"
+            android:text="0"/>
+
+        <TextView
+            android:id="@+id/unitTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:minWidth="120dp"
+            android:textSize="25sp"
+            android:text="time(s)"/>
+
+        </LinearLayout>
+
+    <ImageView
+        android:id="@+id/plus_image"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|right"
+        android:gravity="center_vertical|right"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/plus_icon_black"/>
+</LinearLayout>

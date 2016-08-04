@@ -46,15 +46,6 @@ public class Record extends BaseModel{
     public Record(){
     }
 
-    public Record(Category category, long recordType, Date date, boolean bool, long number, String string) {
-        this.category =  FlowManager.getContainerAdapter(Category.class).toForeignKeyContainer(category);
-        this.recordType = recordType;
-        this.date = date;
-        this.bool = bool;
-        this.number = number;
-        this.string = string;
-    }
-
     public long getId() {
         return id;
     }

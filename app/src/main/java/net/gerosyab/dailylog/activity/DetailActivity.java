@@ -1,6 +1,7 @@
 package net.gerosyab.dailylog.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -8,8 +9,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,12 +27,10 @@ import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
 import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.Record;
-import net.gerosyab.dailylog.data.Record_Table;
 import net.gerosyab.dailylog.data.StaticData;
 
 import org.joda.time.DateTime;
 
-import java.sql.Date;
 import java.text.DateFormatSymbols;
 import java.util.List;
 
@@ -41,7 +40,6 @@ public class DetailActivity extends AppCompatActivity {
     CaldroidFragment caldroidFragment;
     LinearLayout calendarContainerLinear;
     Category category;
-    List<Record> records;
     long categoryID;
     TextView yearTextView, monthTextView;
     ListView yearListView, monthListView;
@@ -96,7 +94,11 @@ public class DetailActivity extends AppCompatActivity {
             monthArrayAdapter.add(monthStr[i]);
         }
 
-        records = category.getRecords();
+//        records = category.getRecords();
+        DateTime startDayOfMonthDt, endDayOfMonthDt;
+        startDayOfMonthDt = dt.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
+        endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTime(23, 59, 59, 0);
+        List<Record> records = category.getRecords(new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfMonthDt.toDate().getTime()));
 
         for (Record record : records) {
             java.util.Date utilDate = new java.util.Date(record.getDate().getTime());
@@ -152,6 +154,10 @@ public class DetailActivity extends AppCompatActivity {
     private void initViews(){
         dt = new DateTime();
 
+        if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
+
+        }
+
         calendarContainerLinear = (LinearLayout) findViewById(R.id.calendarContainerLinear);
         yearTextView = (TextView) findViewById(R.id.yearText);
         monthTextView = (TextView) findViewById(R.id.monthText);
@@ -177,11 +183,72 @@ public class DetailActivity extends AppCompatActivity {
                 dt = new DateTime(year, month, day, 0, 0);
                 yearTextView.setText("" + year);
                 monthTextView.setText(monthStr[month - 1]);
+
+                DateTime startDayOfMonthDt, endDayOfMonthDt;
+                startDayOfMonthDt = dt.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
+//                endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTime(23, 59, 59, 0);
+                endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
+                List<Record> records = category.getRecords(new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfMonthDt.toDate().getTime()));
+                for (Record record : records) {
+                    java.util.Date utilDate = new java.util.Date(record.getDate().getTime());
+                    caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg), utilDate);
+                    caldroidFragment.setTextColorForDate(R.color.selected_cell_text_color, utilDate);
+                }
             }
 
             @Override
             public void onSelectDate(java.util.Date date, View view) {
-                Toast.makeText(DetailActivity.this, "onSelectDate", Toast.LENGTH_SHORT).show();
+                if(category.getRecordType() != StaticData.RECORD_TYPE_BOOLEAN){
+                    final TextView tx = (TextView) view;
+                    final java.util.Date finalDate = date;
+
+                    Record record = category.getRecord(new java.sql.Date(date.getTime()));
+                    if(record == null) {
+                        //dialog 에서 새로 입력
+                        record = new Record();
+                        record.setDate(new java.sql.Date(finalDate.getTime()));
+                        record.associateCategory(category);
+                        if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
+                            record.setRecordType(StaticData.RECORD_TYPE_NUMBER);
+
+                            record.setNumber(1);
+                        }else if(category.getRecordType() == StaticData.RECORD_TYPE_MEMO){
+                            record.setRecordType(StaticData.RECORD_TYPE_MEMO);
+
+                            record.setString("");
+                        }
+                        //dialog 결과에 따라
+                        //record.save();
+
+                    }
+                    else{
+                        //dialog 로 데이터 보여줌
+
+                        //dialog 에서 edit, delete 눌러 처리
+                    }
+
+                    final Record finalRecord = record;
+
+//                    new AlertDialog.Builder(DetailActivity.this, R.style.AppTheme)
+//                            .setTitle("Input the number(s)")
+//                            .setView(numberPicker)
+//                            .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    tx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
+//                                    tx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+//                                    finalRecord.setNumber(numberPicker.getValue());
+//                                    finalRecord.save();
+//                                }
+//                            }).setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    tx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
+//                                    tx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+//                                    finalRecord.delete();
+//                                }
+//                    }).show();
+                }
             }
 
             @Override
@@ -193,28 +260,27 @@ public class DetailActivity extends AppCompatActivity {
 
             @Override
             public void onLongClickDate(java.util.Date date, View view) {
-                TextView tx = (TextView) view;
-                Record record = category.getRecord(new java.sql.Date(date.getTime()));
-                if(record != null) {
-                    Toast.makeText(context, "Long Clicked - record : " + record, Toast.LENGTH_LONG).show();
-                    tx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
-                    tx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
-                    record.delete();
-                }else{
-                    Toast.makeText(context, "Long Clicked - record null" + record, Toast.LENGTH_LONG).show();
-                    tx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
-                    tx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
-                    record = new Record();
-                    record.associateCategory(category);
-                    record.setRecordType(StaticData.RECORD_TYPE_BOOLEAN);
-                    record.setBool(true);
-                    record.setDate(new java.sql.Date(date.getTime()));
-                    record.save();
+                if (category.getRecordType() == StaticData.RECORD_TYPE_BOOLEAN) {
+                    TextView tx = (TextView) view;
+                    Record record = category.getRecord(new java.sql.Date(date.getTime()));
+                    if (record != null) {
+//                        Toast.makeText(context, "Long Clicked - record : " + record, Toast.LENGTH_LONG).show();
+                        tx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
+                        tx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+                        record.delete();
+                    } else {
+//                        Toast.makeText(context, "Long Clicked - record null" + record, Toast.LENGTH_LONG).show();
+                        tx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
+                        tx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+                        record = new Record();
+                        record.associateCategory(category);
+                        record.setRecordType(StaticData.RECORD_TYPE_BOOLEAN);
+                        record.setBool(true);
+                        record.setDate(new java.sql.Date(date.getTime()));
+                        record.save();
+                    }
                 }
-
-//                caldroidFragment.setSelectedDate(date);
             }
-
         });
 
         yearListView.setDivider(null);

@@ -3,12 +3,12 @@
     package="net.gerosyab.dailylog">
 
     <application
+        android:name=".DailyLogApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="net.gerosyab.dailylog.DailyLogApplication">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
@@ -19,36 +19,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.DetailActivity"
+        <activity
+            android:name=".activity.DetailActivity"
             android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity" />
         </activity>
-
-        <activity android:name=".activity.CategoryActivity"
+        <activity
+            android:name=".activity.CategoryActivity"
             android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity" />
         </activity>
-
-        <activity android:name=".activity.StatisticActivity"
+        <activity
+            android:name=".activity.StatisticActivity"
             android:parentActivityName=".activity.CategoryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.CategoryActivity" />
         </activity>
-
+        <activity android:name=".activity.TestActivity"></activity>
     </application>
 
 </manifest>

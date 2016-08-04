@@ -50,4 +50,19 @@
     <style name="MyCaldroidSquareCell" parent="MyCaldroidCell" >
     </style>
 
+    <style name="statisticTitleText">
+        <item name="android:textSize">15.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#ff000000</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:padding">5.0dip</item>
+    </style>
+
+    <style name="statisticItemText">
+        <item name="android:textSize">13.0sp</item>
+        <item name="android:textColor">#ff222222</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:padding">5.0dip</item>
+    </style>
+
 </resources>

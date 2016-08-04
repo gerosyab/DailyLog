@@ -33,6 +33,8 @@ dependencies {
 
     compile 'joda-time:joda-time:2.9.4'
 
+    compile 'com.opencsv:opencsv:3.7'
+
     apt "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
     // use kapt for kotlin apt
     compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
