@@ -47,11 +47,10 @@ public class Category extends BaseModel {
     @Column
     private long recordType;
 
-//    @Column
-//    private long minValue;
-//
-//    @Column
-//    private long maxValue;
+    @Column
+    private long defaultValue;
+
+    private static final long MAX_VALUE = 99999;
 
     List<Record> records;
 
@@ -89,6 +88,14 @@ public class Category extends BaseModel {
         this.unit = unit;
     }
 
+    public long getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(long defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
     public long getOrder() {
         return order;
     }
@@ -104,6 +111,8 @@ public class Category extends BaseModel {
     public void setRecordType(long recordType) {
         this.recordType = recordType;
     }
+
+    public long getMaxValue(){ return MAX_VALUE; }
 
     @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
     public List<Record> getRecords() {

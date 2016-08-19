@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Category Name"
+        android:text="@string/categoryNameText"
         android:id="@+id/categoryNameTextView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Record Type"
+        android:text="@string/recordTypeText"
         android:id="@+id/recordTypeTextView"
         android:layout_below="@+id/categoryNameEditText"
         android:layout_alignParentLeft="true"
@@ -45,7 +45,7 @@
     <RadioButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Boolean (Yes/No, True/False ...)"
+        android:text="@string/booleanRadioButtonText"
         android:id="@+id/radioButton1"
         android:layout_below="@+id/recordTypeTextView"
         android:layout_alignParentLeft="true"
@@ -54,7 +54,7 @@
     <RadioButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Numeric with unit (Quantity, Duration ...)"
+        android:text="@string/numberRadioButtonText"
         android:id="@+id/radioButton2"
         android:layout_below="@+id/radioButton1"
         android:layout_alignParentLeft="true"
@@ -63,7 +63,7 @@
     <RadioButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Memo (Sentence, Scribble ...)"
+        android:text="@string/memoRadioButtonText"
         android:id="@+id/radioButton3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -74,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Unit"
+        android:text="@string/unitText"
         android:id="@+id/unitTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -87,5 +87,24 @@
         android:hint="@string/unitEditTextHint"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/unitTextView"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/defaultValueText"
+        android:id="@+id/defaultValueTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/unitEditText" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/defaultValueEditText"
+        android:hint="@string/defaultValueTextHint"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/defaultValueTextView"
         android:layout_alignParentLeft="true" />
 </RelativeLayout>

@@ -6,7 +6,15 @@
     <string name="action_save">SAVE</string>
     <string name="action_edit">EDIT</string>
     <string name="action_delete">DELETE</string>
+    <string name="categoryNameText">Category Name</string>
+    <string name="recordTypeText">Record Type</string>
+    <string name="booleanRadioButtonText">Boolean (Yes/No, True/False ...)</string>
+    <string name="numberRadioButtonText">Numeric with unit (Quantity, Duration ...)</string>
+    <string name="memoRadioButtonText">Memo (Sentence, Scribble ...)</string>
+    <string name="unitText">Unit</string>
+    <string name="defaultValueText">Default Value</string>
     <string name="unitEditTextHint">time(s), minute, cup(s) ...</string>
+    <string name="defaultValueTextHint">0, 1, 2, ... , 5 ...</string>
     <string name="confirm">CONFIRM</string>
     <string name="cancel">CANCEL</string>
     <string name="dialog_message_confirm_delete">Delete Category ??</string>

@@ -28,12 +28,14 @@ import java.util.List;
 public class CategoryActivity extends AppCompatActivity {
     long categoryMode;
     View rootView;
-    EditText categoryNameEditText, unitEditText;
-    TextView unitTitleTextView;
+    EditText categoryNameEditText, unitEditText, defaultValueEditText;
+    TextView unitTitleTextView, defaultValueTitleTextView;
     RadioButton radioButton1, radioButton2, radioButton3;
     Category category;
     String categoryNameStr = "";
     String unitStr = "";
+    String defaultValueStr = "";
+    long defaultValueNum;
     long recordType;
     long categoryNum;
     long categoryID;
@@ -51,6 +53,8 @@ public class CategoryActivity extends AppCompatActivity {
         radioButton1  = (RadioButton)findViewById(R.id.radioButton1);
         radioButton2 = (RadioButton)findViewById(R.id.radioButton2);
         radioButton3 = (RadioButton)findViewById(R.id.radioButton3);
+        defaultValueTitleTextView = (TextView)findViewById(R.id.defaultValueTextView);
+        defaultValueEditText = (EditText)findViewById(R.id.defaultValueEditText);
 
         Intent intent = getIntent();
         categoryMode = intent.getLongExtra(StaticData.CATEGORY_MODE_INTENT_EXTRA, StaticData.CATEGORY_MODE_CREATE);
@@ -70,6 +74,8 @@ public class CategoryActivity extends AppCompatActivity {
                 radioButton3.setChecked(false);
                 unitTitleTextView.setEnabled(false);
                 unitEditText.setEnabled(false);
+                defaultValueTitleTextView.setEnabled(false);
+                defaultValueEditText.setEnabled(false);
                 recordType = StaticData.RECORD_TYPE_BOOLEAN;
             }
         });
@@ -82,6 +88,8 @@ public class CategoryActivity extends AppCompatActivity {
                 radioButton3.setChecked(false);
                 unitTitleTextView.setEnabled(true);
                 unitEditText.setEnabled(true);
+                defaultValueTitleTextView.setEnabled(true);
+                defaultValueEditText.setEnabled(true);
                 recordType = StaticData.RECORD_TYPE_NUMBER;
             }
         });
@@ -94,6 +102,8 @@ public class CategoryActivity extends AppCompatActivity {
                 radioButton2.setChecked(false);
                 unitTitleTextView.setEnabled(false);
                 unitEditText.setEnabled(false);
+                defaultValueTitleTextView.setEnabled(false);
+                defaultValueEditText.setEnabled(false);
                 recordType = StaticData.RECORD_TYPE_MEMO;
             }
         });
@@ -106,6 +116,8 @@ public class CategoryActivity extends AppCompatActivity {
             radioButton3.setChecked(false);
             unitTitleTextView.setEnabled(false);
             unitEditText.setEnabled(false);
+            defaultValueTitleTextView.setEnabled(false);
+            defaultValueEditText.setEnabled(false);
             recordType = StaticData.RECORD_TYPE_BOOLEAN;
 //            category.setRecordType(recordType);
         }
@@ -124,6 +136,8 @@ public class CategoryActivity extends AppCompatActivity {
                 radioButton3.setEnabled(false);
                 unitTitleTextView.setEnabled(false);
                 unitEditText.setEnabled(false);
+                defaultValueTitleTextView.setEnabled(false);
+                defaultValueEditText.setEnabled(false);
 
                 if (recordType == StaticData.RECORD_TYPE_BOOLEAN) {
                     radioButton1.setChecked(true);
@@ -135,6 +149,8 @@ public class CategoryActivity extends AppCompatActivity {
                     radioButton3.setChecked(false);
                     unitTitleTextView.setText(category.getUnit());
                     unitTitleTextView.setEnabled(true);
+                    defaultValueEditText.setText(String.valueOf(category.getDefaultValue()));
+                    defaultValueEditText.setEnabled(true);
                 } else if (recordType == StaticData.RECORD_TYPE_MEMO) {
                     radioButton1.setChecked(false);
                     radioButton2.setChecked(false);
@@ -186,9 +202,24 @@ public class CategoryActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "The maximum length of Unit is 20 characters", Toast.LENGTH_LONG).show();
                     return true;
                 }
+
+                defaultValueStr = defaultValueEditText.getText().toString();
+                if(defaultValueStr.equalsIgnoreCase("")){
+                    Toast.makeText(getApplicationContext(), "Default value has to be specified if the record type is numeric", Toast.LENGTH_LONG).show();
+                    return true;
+                }else if(!defaultValueStr.contains("0123456789")){
+                    Toast.makeText(getApplicationContext(), "Default value has to be numeric value", Toast.LENGTH_LONG).show();
+                    return true;
+                }
+                else if(!(0 <= Long.getLong(defaultValueStr) && Long.getLong(defaultValueStr) <= category.getMaxValue())){
+                    Toast.makeText(getApplicationContext(), "Default value has to be between 0 to " + category.getMaxValue(), Toast.LENGTH_LONG).show();
+                    return true;
+                }
+
             }
             else{
                 unitStr="";
+                defaultValueStr="";
             }
 
             //같은 이름의 카테고리가 있는지 확인
@@ -196,6 +227,7 @@ public class CategoryActivity extends AppCompatActivity {
             // DB 신규 저장 or 업데이트 처리
             category.setName(categoryNameStr);
             category.setUnit(unitStr);
+            category.setDefaultValue(Long.getLong(defaultValueStr));
             category.setRecordType(recordType);
             if(categoryMode == StaticData.CATEGORY_MODE_CREATE){
                 category.setOrder(categoryNum + 1);
