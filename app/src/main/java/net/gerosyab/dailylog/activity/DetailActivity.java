@@ -1,23 +1,24 @@
 package net.gerosyab.dailylog.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.roomorama.caldroid.CaldroidFragment;
@@ -28,13 +29,15 @@ import net.gerosyab.dailylog.data.Category;
 import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.StaticData;
+import net.gerosyab.dailylog.fragment.MessagePopupDialog;
+import net.gerosyab.dailylog.fragment.NumberPickerDialog;
 
 import org.joda.time.DateTime;
 
 import java.text.DateFormatSymbols;
 import java.util.List;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements NumberPickerDialog.NumberPickerDialogListener, MessagePopupDialog.MessagePopupDialogListener {
 
     Context context;
     CaldroidFragment caldroidFragment;
@@ -49,6 +52,8 @@ public class DetailActivity extends AppCompatActivity {
     final int YEAR_LIST_VIEW = 1;
     final int MONTH_LIST_VIEW = 2;
 
+    InputMethodManager imm;
+    TextView globalTx;
 
     DateTime dt;
     final int startYear = 1900;
@@ -67,6 +72,9 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         context = getApplicationContext();
+
+        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
         setContentView(R.layout.activity_detail);
 
         Intent intent = getIntent();
@@ -184,11 +192,11 @@ public class DetailActivity extends AppCompatActivity {
                 yearTextView.setText("" + year);
                 monthTextView.setText(monthStr[month - 1]);
 
-                DateTime startDayOfMonthDt, endDayOfMonthDt;
-                startDayOfMonthDt = dt.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
+                DateTime startDayOfPrevMonthDt, endDayOfNextMonthDt;
+                startDayOfPrevMonthDt = dt.minusMonths(1).dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
 //                endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTime(23, 59, 59, 0);
-                endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-                List<Record> records = category.getRecords(new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfMonthDt.toDate().getTime()));
+                endDayOfNextMonthDt = dt.plusMonths(1).dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
+                List<Record> records = category.getRecords(new java.sql.Date(startDayOfPrevMonthDt.toDate().getTime()), new java.sql.Date(endDayOfNextMonthDt.toDate().getTime()));
                 for (Record record : records) {
                     java.util.Date utilDate = new java.util.Date(record.getDate().getTime());
                     caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg), utilDate);
@@ -198,56 +206,58 @@ public class DetailActivity extends AppCompatActivity {
 
             @Override
             public void onSelectDate(java.util.Date date, View view) {
+                Log.d("DetailActivity", "onSelectDate");
                 if(category.getRecordType() != StaticData.RECORD_TYPE_BOOLEAN){
-                    final TextView tx = (TextView) view;
+                    globalTx = (TextView) view;
                     final java.util.Date finalDate = date;
 
                     Record record = category.getRecord(new java.sql.Date(date.getTime()));
                     if(record == null) {
+                        Log.d("DetailActivity", "Record Null");
                         //dialog 에서 새로 입력
                         record = new Record();
                         record.setDate(new java.sql.Date(finalDate.getTime()));
                         record.associateCategory(category);
+
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                        if (prev != null) {
+                            ft.remove(prev);
+                        }
+                        ft.addToBackStack(null);
+
                         if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
                             record.setRecordType(StaticData.RECORD_TYPE_NUMBER);
-
-                            record.setNumber(1);
+                            NumberPickerDialog dialog = NumberPickerDialog.newInstance(record.getDateString(), "" + category.getDefaultValue(),
+                                                            category.getUnit(), category.getMaxValue(), StaticData.DIALOG_MODE_CREATE, record);
+                            dialog.show(ft, "numberPickerDialog");
                         }else if(category.getRecordType() == StaticData.RECORD_TYPE_MEMO){
                             record.setRecordType(StaticData.RECORD_TYPE_MEMO);
-
-                            record.setString("");
+                            MessagePopupDialog dialog = MessagePopupDialog.newInstance(record.getDateString(), "",
+                                    category.getMaxLength(), StaticData.DIALOG_MODE_CREATE, record);
+                            dialog.show(ft, "messagePopupDialog");
                         }
-                        //dialog 결과에 따라
-                        //record.save();
-
                     }
                     else{
                         //dialog 로 데이터 보여줌
-
+                        Log.d("DetailActivity", "Record Not Null : " + record.getDate() + ", " + record.getNumber() + ", " + record.getString() );
                         //dialog 에서 edit, delete 눌러 처리
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                        if (prev != null) {
+                            ft.remove(prev);
+                        }
+                        ft.addToBackStack(null);
+                        if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
+                            NumberPickerDialog dialog = NumberPickerDialog.newInstance(record.getDateString(), "" + record.getNumber(),
+                                    category.getUnit(), category.getMaxValue(), StaticData.DIALOG_MODE_EDIT, record);
+                            dialog.show(ft, "numberPickerDialog");
+                        }else if(category.getRecordType() == StaticData.RECORD_TYPE_MEMO){
+                            MessagePopupDialog dialog = MessagePopupDialog.newInstance(record.getDateString(), record.getString(),
+                                    category.getMaxLength(), StaticData.DIALOG_MODE_EDIT, record);
+                            dialog.show(ft, "messagePopupDialog");
+                        }
                     }
-
-                    final Record finalRecord = record;
-
-//                    new AlertDialog.Builder(DetailActivity.this, R.style.AppTheme)
-//                            .setTitle("Input the number(s)")
-//                            .setView(numberPicker)
-//                            .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    tx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
-//                                    tx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
-//                                    finalRecord.setNumber(numberPicker.getValue());
-//                                    finalRecord.save();
-//                                }
-//                            }).setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    tx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
-//                                    tx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
-//                                    finalRecord.delete();
-//                                }
-//                    }).show();
                 }
             }
 
@@ -346,7 +356,7 @@ public class DetailActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), StatisticActivity.class);
+                Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
                 intent.putExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, category.getId());
                 startActivity(intent);
             }
@@ -369,5 +379,43 @@ public class DetailActivity extends AppCompatActivity {
                 changeView(CALENDER_VIEW);
             }
         });
+    }
+
+    @Override
+    public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder) {
+        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
+        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+        imm.hideSoftInputFromWindow(iBinder, 0);
+    }
+
+    @Override
+    public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder) {
+        imm.hideSoftInputFromWindow(iBinder, 0);
+    }
+
+    @Override
+    public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder) {
+        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
+        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+        imm.hideSoftInputFromWindow(iBinder, 0);
+    }
+
+    @Override
+    public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder) {
+        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
+        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+        imm.hideSoftInputFromWindow(iBinder, 0);
+    }
+
+    @Override
+    public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder) {
+        imm.hideSoftInputFromWindow(iBinder, 0);
+    }
+
+    @Override
+    public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder) {
+        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
+        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+        imm.hideSoftInputFromWindow(iBinder, 0);
     }
 }

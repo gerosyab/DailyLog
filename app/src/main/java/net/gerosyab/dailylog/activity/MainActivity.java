@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void deleteCategory(final long id){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setMessage(getResources().getString(R.string.dialog_message_confirm_delete) + " \"" + categories.get((int)id).getName() + "\"")
+        builder.setMessage(getResources().getString(R.string.dialog_message_confirm_delete_category) + " [" + categories.get((int)id).getName() + "]")
         .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

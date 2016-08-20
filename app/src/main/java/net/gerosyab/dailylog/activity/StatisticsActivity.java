@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -15,14 +16,13 @@ import net.gerosyab.dailylog.data.Category;
 import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.StaticData;
 
+import org.joda.time.DateTime;
 import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Created by donghe on 2016-06-07.
  */
-public class StatisticActivity extends AppCompatActivity {
+public class StatisticsActivity extends AppCompatActivity {
     Category category;
     long categoryID;
 
@@ -35,15 +35,18 @@ public class StatisticActivity extends AppCompatActivity {
     TextView lastYearText;
     TextView firstRecordDateText;
     TextView lastRecordDateText;
+    LinearLayout averageLinearLayout;
     TextView averageValueText;
     TextView periodText;
 
-    DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+    TextView debugText;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_statistic);
+        setContentView(R.layout.activity_statistics);
         last7daysText = (TextView)findViewById(R.id.last7DaysText);
         last15daysText = (TextView)findViewById(R.id.last15DaysText);
         lastMonthText = (TextView)findViewById(R.id.lastMonthText);
@@ -53,8 +56,11 @@ public class StatisticActivity extends AppCompatActivity {
         lastYearText = (TextView)findViewById(R.id.lastYearText);
         firstRecordDateText = (TextView)findViewById(R.id.firstRecordDateText);
         lastRecordDateText = (TextView)findViewById(R.id.lastRecordDateText);
+        averageLinearLayout = (LinearLayout)findViewById(R.id.averageLinearLayout);
         averageValueText = (TextView)findViewById(R.id.averageText);
         periodText = (TextView)findViewById(R.id.periodText);
+
+        debugText = (TextView)findViewById(R.id.debugText);
 
         Intent intent = getIntent();
         categoryID = intent.getLongExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, -1);
@@ -71,27 +77,49 @@ public class StatisticActivity extends AppCompatActivity {
         last3MonthsText.setText(String.valueOf(category.getLast3MonthsRecordNum()));
         last6MonthsText.setText(String.valueOf(category.getLast6MonthsRecordNum()));
         lastYearText.setText(String.valueOf(category.getLastYearRecordNum()));
-        firstRecordDateText.setText(fmt.print(category.getFirstRecordDateTime()));
-        lastRecordDateText.setText(fmt.print(category.getLastRecordDateTime()));
+
+        DateTime firstRecordDateTime = category.getFirstRecordDateTime();
+        DateTime lastRecordDateTime = category.getLastRecordDateTime();
+
+        if(firstRecordDateTime == null){
+            firstRecordDateText.setText("-");
+        }
+        else{
+            firstRecordDateText.setText(StaticData.fmt.print(firstRecordDateTime));
+        }
+        if(lastRecordDateTime == null){
+            lastRecordDateText.setText("-");
+        }
+        else{
+            lastRecordDateText.setText(StaticData.fmt.print(lastRecordDateTime));
+        }
         if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
             averageValueText.setText(String.valueOf(category.getAverage()));
         }else{
-            averageValueText.setVisibility(View.GONE);
+            averageLinearLayout.setVisibility(View.GONE);
         }
-        lastRecordDateText.setText(fmt.print(category.getLastRecordDateTime()));
         Period period = category.getRecordPeriod();
-        periodText.setText(period.getYears() + " year(s) " + period.getMonths() + " month(s)\n\r" + period.getWeeks() + " week(s) " + period.getDays() + " day(s)");
+        if(period != null) {
+            periodText.setText(period.getYears() + " year(s) " + period.getMonths() + " month(s)\n\r" + period.getWeeks() + " week(s) " + period.getDays() + " day(s)");
+        }else{
+            periodText.setText("0 year(s) 0 month(s) 0 week(s)  day(s)");
+        }
+
+//        List<Record> records = category.getRecords();
+//        for(Record record : records) {
+//            debugText.append("" + record.getDate() + ", type : " + record.getRecordType() + ", number : " +  record.getNumber() + ", string : " + record.getString() + "\r\n");
+//        }
 
         ActionBar ab = getSupportActionBar();
-        ab.setTitle("Statistic [" + category.getName() + "]");
+        ab.setTitle("Statistics [" + category.getName() + "]");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), TestActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getApplicationContext(), TestActivity.class);
+//                startActivity(intent);
             }
         });
     }

@@ -12,6 +12,8 @@ import com.raizlabs.android.dbflow.structure.container.ForeignKeyContainer;
 
 import net.gerosyab.dailylog.database.AppDatabase;
 
+import org.joda.time.DateTime;
+
 import java.sql.Date;
 
 /**
@@ -104,5 +106,9 @@ public class Record extends BaseModel{
 
     public void associateCategory(Category category) {
         this.category = FlowManager.getContainerAdapter(Category.class).toForeignKeyContainer(category);
+    }
+
+    public String getDateString(){
+        return StaticData.fmt.print(new DateTime(this.getDate()));
     }
 }

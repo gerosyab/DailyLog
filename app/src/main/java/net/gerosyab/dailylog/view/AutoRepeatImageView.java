@@ -25,8 +25,8 @@ import android.widget.ImageView;
 
 public class AutoRepeatImageView extends ImageView {
 
-    private long initialRepeatDelay = 500;
-    private long repeatIntervalInMilliseconds = 100;
+    private long initialRepeatDelay = 150;
+    private long repeatIntervalInMilliseconds = 20;
 
     private Runnable repeatClickWhileButtonHeldRunnable = new Runnable() {
 

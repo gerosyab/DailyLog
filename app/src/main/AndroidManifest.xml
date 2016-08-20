@@ -21,6 +21,7 @@
         </activity>
         <activity
             android:name=".activity.DetailActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +33,7 @@
         </activity>
         <activity
             android:name=".activity.CategoryActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,7 +44,7 @@
                 android:value=".activity.MainActivity" />
         </activity>
         <activity
-            android:name=".activity.StatisticActivity"
+            android:name=".activity.StatisticsActivity"
             android:parentActivityName=".activity.CategoryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,7 +54,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.CategoryActivity" />
         </activity>
-        <activity android:name=".activity.TestActivity"></activity>
     </application>
 
 </manifest>

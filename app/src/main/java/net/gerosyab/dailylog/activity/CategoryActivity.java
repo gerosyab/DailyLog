@@ -6,6 +6,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +24,9 @@ import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
 import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.StaticData;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 
@@ -129,6 +134,7 @@ public class CategoryActivity extends AppCompatActivity {
 
             if(category != null) {
                 categoryNameEditText.setText(category.getName());
+
                 recordType = category.getRecordType();
 
                 radioButton1.setEnabled(false);
@@ -147,8 +153,10 @@ public class CategoryActivity extends AppCompatActivity {
                     radioButton1.setChecked(false);
                     radioButton2.setChecked(true);
                     radioButton3.setChecked(false);
-                    unitTitleTextView.setText(category.getUnit());
                     unitTitleTextView.setEnabled(true);
+                    unitEditText.setEnabled(true);
+                    unitEditText.setText(category.getUnit());
+                    defaultValueTitleTextView.setEnabled(true);
                     defaultValueEditText.setText(String.valueOf(category.getDefaultValue()));
                     defaultValueEditText.setEnabled(true);
                 } else if (recordType == StaticData.RECORD_TYPE_MEMO) {
@@ -187,8 +195,10 @@ public class CategoryActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "The maximum length of Category Name is 50 characters", Toast.LENGTH_LONG).show();
                 return true;
             }else if(isCategoryNameExists(categoryNameStr)){
-                Toast.makeText(getApplicationContext(), "Category Name \"" + categoryNameStr + "\" already exists", Toast.LENGTH_LONG).show();
-                return true;
+                if(categoryMode == StaticData.CATEGORY_MODE_CREATE) {
+                    Toast.makeText(getApplicationContext(), "Category Name \"" + categoryNameStr + "\" already exists", Toast.LENGTH_LONG).show();
+                    return true;
+                }
             }
 
             if(radioButton2.isChecked()) {
@@ -204,14 +214,15 @@ public class CategoryActivity extends AppCompatActivity {
                 }
 
                 defaultValueStr = defaultValueEditText.getText().toString();
-                if(defaultValueStr.equalsIgnoreCase("")){
+
+                if(defaultValueStr == null || defaultValueStr.equalsIgnoreCase("")){
                     Toast.makeText(getApplicationContext(), "Default value has to be specified if the record type is numeric", Toast.LENGTH_LONG).show();
                     return true;
-                }else if(!defaultValueStr.contains("0123456789")){
+                }else if(!NumberUtils.isNumber(defaultValueStr)){
                     Toast.makeText(getApplicationContext(), "Default value has to be numeric value", Toast.LENGTH_LONG).show();
                     return true;
                 }
-                else if(!(0 <= Long.getLong(defaultValueStr) && Long.getLong(defaultValueStr) <= category.getMaxValue())){
+                else if(!(0 <= Long.parseLong(defaultValueStr) && Long.parseLong(defaultValueStr) <= category.getMaxValue())){
                     Toast.makeText(getApplicationContext(), "Default value has to be between 0 to " + category.getMaxValue(), Toast.LENGTH_LONG).show();
                     return true;
                 }
@@ -227,7 +238,11 @@ public class CategoryActivity extends AppCompatActivity {
             // DB 신규 저장 or 업데이트 처리
             category.setName(categoryNameStr);
             category.setUnit(unitStr);
-            category.setDefaultValue(Long.getLong(defaultValueStr));
+            if(defaultValueStr == null || defaultValueStr.equalsIgnoreCase("")){
+                category.setDefaultValue(0);
+            }else {
+                category.setDefaultValue(Long.parseLong(defaultValueStr));
+            }
             category.setRecordType(recordType);
             if(categoryMode == StaticData.CATEGORY_MODE_CREATE){
                 category.setOrder(categoryNum + 1);

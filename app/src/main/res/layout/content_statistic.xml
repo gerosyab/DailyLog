@@ -9,8 +9,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activity.StatisticActivity"
-    tools:showIn="@layout/activity_statistic">
+    tools:context=".activity.StatisticsActivity"
+    tools:showIn="@layout/activity_statistics">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -310,6 +310,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/averageLinearLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -358,6 +359,11 @@
                     android:gravity="right"
                     android:text="None" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/debugText"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

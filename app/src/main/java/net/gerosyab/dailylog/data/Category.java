@@ -1,6 +1,7 @@
 package net.gerosyab.dailylog.data;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
@@ -50,7 +51,8 @@ public class Category extends BaseModel {
     @Column
     private long defaultValue;
 
-    private static final long MAX_VALUE = 99999;
+    private final long MAX_VALUE = 99999;
+    private final long MAX_LENGTH = 500;
 
     List<Record> records;
 
@@ -112,7 +114,9 @@ public class Category extends BaseModel {
         this.recordType = recordType;
     }
 
-    public long getMaxValue(){ return MAX_VALUE; }
+    public long getMaxValue(){ return this.MAX_VALUE; }
+
+    public long getMaxLength(){ return this.MAX_LENGTH; }
 
     @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
     public List<Record> getRecords() {
@@ -156,9 +160,11 @@ public class Category extends BaseModel {
                .querySingle();
 
         if(record == null){
+            Log.d("Statistic", "getFirstRecordDateTime is null");
             return null;
         }
         else{
+            Log.d("Statistic", "getFirstRecordDateTime is not null");
             return new DateTime(record.getDate());
         }
     }
@@ -171,9 +177,11 @@ public class Category extends BaseModel {
                 .querySingle();
 
         if(record == null){
+            Log.d("Statistic", "getlastRecordDateTime is null");
             return null;
         }
         else{
+            Log.d("Statistic", "getlastRecordDateTime is not null");
             return new DateTime(record.getDate());
         }
     }
@@ -262,8 +270,17 @@ public class Category extends BaseModel {
     }
 
     public Period getRecordPeriod(){
-        Period period = new Period(this.getFirstRecordDateTime().toInstant(), this.getLastRecordDateTime().toInstant());
-        return period;
+        DateTime firstRecordDateTime = this.getFirstRecordDateTime();
+        DateTime lastRecordDateTime = this.getLastRecordDateTime();
+
+        if(firstRecordDateTime != null && lastRecordDateTime != null) {
+            Period period = new Period(firstRecordDateTime.toInstant(), lastRecordDateTime.toInstant());
+            return period;
+        }
+        else{
+            return null;
+        }
+
     }
 
     public double getAverage(){
@@ -271,10 +288,13 @@ public class Category extends BaseModel {
             Cursor cursor = SQLite.select(sum(Record_Table.number))
             .from(Record.class)
             .where(Record_Table.category_id.eq(id)).query();
-        long sum = cursor.getLong(1);
+
+        cursor.moveToFirst();
+
+        long sum = cursor.getLong(0);
         long cnt = this.getTotalRecordNum();
         if(cnt > 0) {
-            return sum / cnt;
+            return (double) sum / cnt;
         }
         else{
             return 0;

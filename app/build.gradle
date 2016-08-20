@@ -31,6 +31,8 @@ dependencies {
 
     compile 'com.roomorama:caldroid:3.0.1'
 
+    compile 'org.apache.commons:commons-lang3:3.4'
+
     compile 'joda-time:joda-time:2.9.4'
 
     compile 'com.opencsv:opencsv:3.7'

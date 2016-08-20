@@ -6,7 +6,7 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:fitsSystemWindows="true"
 android:background="@color/white"
-tools:context=".activity.StatisticActivity">
+tools:context=".activity.StatisticsActivity">
 
 <include layout="@layout/content_statistic" />
 

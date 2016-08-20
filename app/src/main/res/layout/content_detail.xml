@@ -16,48 +16,51 @@
         android:id="@+id/yearText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:gravity="left"
-        android:layout_marginTop="15dp"
+        android:layout_alignParentTop="true"
         android:layout_marginLeft="10dp"
-        android:textSize="35sp"
-        android:textColor="@color/colorPrimary"/>
+        android:layout_marginTop="15dp"
+        android:gravity="left"
+        android:paddingTop="10dp"
+        android:textColor="@color/colorPrimary"
+        android:textSize="35sp" />
+
     <TextView
         android:id="@+id/monthText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
         android:layout_toRightOf="@id/yearText"
         android:gravity="right"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="10dp"
-        android:textSize="35sp"
-        android:textColor="@color/colorPrimary"/>
+        android:paddingTop="10dp"
+        android:textColor="@color/colorPrimary"
+        android:textSize="35sp" />
+
     <LinearLayout
         android:id="@+id/calendarContainerLinear"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/monthText"
-        android:layout_centerHorizontal="true">
-    </LinearLayout>
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical"></LinearLayout>
+
     <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
         android:id="@+id/yearListView"
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/monthText" />
-    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
-        android:id="@+id/monthListView"
+        android:layout_below="@+id/monthText"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/monthText" />
+        android:visibility="invisible" />
+
+    <ListView
+        android:id="@+id/monthListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/monthText"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible" />
 
 </RelativeLayout>
