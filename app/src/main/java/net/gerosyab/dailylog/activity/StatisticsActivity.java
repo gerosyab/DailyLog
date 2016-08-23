@@ -33,6 +33,7 @@ public class StatisticsActivity extends AppCompatActivity {
     TextView last3MonthsText;
     TextView last6MonthsText;
     TextView lastYearText;
+    TextView totalRecordNumText;
     TextView firstRecordDateText;
     TextView lastRecordDateText;
     LinearLayout averageLinearLayout;
@@ -54,6 +55,7 @@ public class StatisticsActivity extends AppCompatActivity {
         last3MonthsText = (TextView)findViewById(R.id.last3MonthsText);
         last6MonthsText = (TextView)findViewById(R.id.last6MonthsText);
         lastYearText = (TextView)findViewById(R.id.lastYearText);
+        totalRecordNumText = (TextView)findViewById(R.id.totalRecordsText);
         firstRecordDateText = (TextView)findViewById(R.id.firstRecordDateText);
         lastRecordDateText = (TextView)findViewById(R.id.lastRecordDateText);
         averageLinearLayout = (LinearLayout)findViewById(R.id.averageLinearLayout);
@@ -77,6 +79,8 @@ public class StatisticsActivity extends AppCompatActivity {
         last3MonthsText.setText(String.valueOf(category.getLast3MonthsRecordNum()));
         last6MonthsText.setText(String.valueOf(category.getLast6MonthsRecordNum()));
         lastYearText.setText(String.valueOf(category.getLastYearRecordNum()));
+
+        totalRecordNumText.setText(String.valueOf(category.getTotalRecordNum()));
 
         DateTime firstRecordDateTime = category.getFirstRecordDateTime();
         DateTime lastRecordDateTime = category.getLastRecordDateTime();

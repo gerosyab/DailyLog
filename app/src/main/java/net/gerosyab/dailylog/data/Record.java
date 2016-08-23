@@ -13,8 +13,10 @@ import com.raizlabs.android.dbflow.structure.container.ForeignKeyContainer;
 import net.gerosyab.dailylog.database.AppDatabase;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by donghe on 2016-06-03.
@@ -110,5 +112,8 @@ public class Record extends BaseModel{
 
     public String getDateString(){
         return StaticData.fmt.print(new DateTime(this.getDate()));
+    }
+    public String getDateString(DateTimeFormatter dtf){
+        return dtf.print(new DateTime(this.getDate()));
     }
 }

@@ -191,10 +191,10 @@ public class CategoryActivity extends AppCompatActivity {
             if(categoryNameStr.equalsIgnoreCase("")){
                 Toast.makeText(getApplicationContext(), "Category Name must be specified", Toast.LENGTH_LONG).show();
                 return true;
-            }else if(categoryNameStr.length() > 50){
+            }else if(categoryNameStr.length() > Category.getMaxNameLength()){
                 Toast.makeText(getApplicationContext(), "The maximum length of Category Name is 50 characters", Toast.LENGTH_LONG).show();
                 return true;
-            }else if(isCategoryNameExists(categoryNameStr)){
+            }else if(Category.isCategoryNameExists(categoryNameStr)){
                 if(categoryMode == StaticData.CATEGORY_MODE_CREATE) {
                     Toast.makeText(getApplicationContext(), "Category Name \"" + categoryNameStr + "\" already exists", Toast.LENGTH_LONG).show();
                     return true;
@@ -259,15 +259,5 @@ public class CategoryActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean isCategoryNameExists(String categoryNameStr){
-        List<Category> categories =SQLite.select(Category_Table.name)
-                        .from(Category.class)
-                        .queryList();
-        for(Category category : categories){
-            if(categoryNameStr.equals(category.getName())){
-                return true;
-            }
-        }
-        return false;
-    }
+
 }

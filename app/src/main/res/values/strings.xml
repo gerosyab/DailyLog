@@ -21,5 +21,6 @@
     <string name="dialog_message_confirm_delete_category">Delete a category?</string>
     <string name="dialog_message_confirm_delete_record">Delete a record?</string>
     <string name="memoDialogTitle">Memo</string>
+    <string name="send_to">Share exported file to...</string>
     <string name="title_activity_main2">Main2Activity</string>
 </resources>

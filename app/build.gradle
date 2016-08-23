@@ -33,6 +33,8 @@ dependencies {
 
     compile 'org.apache.commons:commons-lang3:3.4'
 
+    compile 'com.github.angads25:filepicker:1.0.2'
+
     compile 'joda-time:joda-time:2.9.4'
 
     compile 'com.opencsv:opencsv:3.7'

@@ -234,7 +234,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                         }else if(category.getRecordType() == StaticData.RECORD_TYPE_MEMO){
                             record.setRecordType(StaticData.RECORD_TYPE_MEMO);
                             MessagePopupDialog dialog = MessagePopupDialog.newInstance(record.getDateString(), "",
-                                    category.getMaxLength(), StaticData.DIALOG_MODE_CREATE, record);
+                                    category.getMaxMemoLength(), StaticData.DIALOG_MODE_CREATE, record);
                             dialog.show(ft, "messagePopupDialog");
                         }
                     }
@@ -254,7 +254,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                             dialog.show(ft, "numberPickerDialog");
                         }else if(category.getRecordType() == StaticData.RECORD_TYPE_MEMO){
                             MessagePopupDialog dialog = MessagePopupDialog.newInstance(record.getDateString(), record.getString(),
-                                    category.getMaxLength(), StaticData.DIALOG_MODE_EDIT, record);
+                                    category.getMaxMemoLength(), StaticData.DIALOG_MODE_EDIT, record);
                             dialog.show(ft, "messagePopupDialog");
                         }
                     }

@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.ForeignKey;
 import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.OneToMany;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
@@ -16,13 +15,13 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 import net.gerosyab.dailylog.database.AppDatabase;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.Period;
 
 import java.sql.Date;
 import java.util.List;
 
 import static com.raizlabs.android.dbflow.sql.language.Method.count;
+import static com.raizlabs.android.dbflow.sql.language.Method.max;
 import static com.raizlabs.android.dbflow.sql.language.Method.sum;
 
 /**
@@ -51,8 +50,9 @@ public class Category extends BaseModel {
     @Column
     private long defaultValue;
 
-    private final long MAX_VALUE = 99999;
-    private final long MAX_LENGTH = 500;
+    private static final long MAX_VALUE = 99999;
+    private static final long MAX_MEMO_LENGTH = 500;
+    private static final long MAX_NAME_LENGTH = 50;
 
     List<Record> records;
 
@@ -114,9 +114,11 @@ public class Category extends BaseModel {
         this.recordType = recordType;
     }
 
-    public long getMaxValue(){ return this.MAX_VALUE; }
+    public static long getMaxValue(){ return MAX_VALUE; }
 
-    public long getMaxLength(){ return this.MAX_LENGTH; }
+    public static long getMaxMemoLength(){ return MAX_MEMO_LENGTH; }
+
+    public static long getMaxNameLength(){ return MAX_NAME_LENGTH; }
 
     @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
     public List<Record> getRecords() {
@@ -124,6 +126,30 @@ public class Category extends BaseModel {
             records = SQLite.select()
                     .from(Record.class)
                     .where(Record_Table.category_id.eq(id))
+                    .queryList();
+        }
+        return records;
+    }
+
+    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
+    public List<Record> getRecordsOrderByIdAscending() {
+        if (records == null || records.isEmpty()) {
+            records = SQLite.select()
+                    .from(Record.class)
+                    .where(Record_Table.category_id.eq(id))
+                    .orderBy(Record_Table.id, true)    //ascending
+                    .queryList();
+        }
+        return records;
+    }
+
+    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
+    public List<Record> getRecordsOrderByDateAscending() {
+        if (records == null || records.isEmpty()) {
+            records = SQLite.select()
+                    .from(Record.class)
+                    .where(Record_Table.category_id.eq(id))
+                    .orderBy(Record_Table.date, true)    //ascending
                     .queryList();
         }
         return records;
@@ -299,6 +325,24 @@ public class Category extends BaseModel {
         else{
             return 0;
         }
+    }
+
+    public static long getLastOrderNum(){
+        Cursor cursor =  SQLite.select(max(Category_Table.order))
+                .from(Category.class).query();
+        return cursor.getLong(0);
+    }
+
+    public static boolean isCategoryNameExists(String categoryNameStr){
+        List<Category> categories =SQLite.select(Category_Table.name)
+                .from(Category.class)
+                .queryList();
+        for(Category category : categories){
+            if(categoryNameStr.equals(category.getName())){
+                return true;
+            }
+        }
+        return false;
     }
 }
 

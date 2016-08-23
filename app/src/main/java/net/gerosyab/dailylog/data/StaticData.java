@@ -22,4 +22,5 @@ public class StaticData {
     public static final long RECORD_TYPE_MEMO = 2;
 
     public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter fmtForBackup = DateTimeFormat.forPattern("yyyy-MM-dd 24HH:mm:ss");
 }
