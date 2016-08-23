@@ -43,6 +43,7 @@ import net.gerosyab.dailylog.data.StaticData;
 import net.gerosyab.dailylog.database.AppDatabase;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,6 +55,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -235,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setTitle("Exporting data [" + category.getName() + "]");
         progressDialog.show();
 
-        String filename = category.getName() + "" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".dat";
+        String filename = category.getName() + "" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".data";
         FileOutputStream outputStream = null;
         File resultFilePath = null;
         File resultFile = null;
@@ -245,15 +247,16 @@ public class MainActivity extends AppCompatActivity {
             resultFile = new File(context.getCacheDir(), filename);
 
             outputStream = new FileOutputStream(resultFile.getAbsolutePath());
-            cw = new CSVWriter(new OutputStreamWriter(outputStream, "UTF-8"),'\t');
+//            cw = new CSVWriter(new OutputStreamWriter(outputStream, "UTF-8"),'\t', '"');
+            cw = new CSVWriter(new OutputStreamWriter(outputStream, "UTF-8"),',', '"');
 
             // Export Data
-            String[] metaDataStr = {"#Version:" + AppDatabase.VERSION,
-                                    "#Name:" + category.getName(),
-                                    "#Unit:" + category.getUnit(),
-                                    "#Type:" + category.getRecordType(),
-                                    "#DefaultValue:" + category.getDefaultValue(),
-                                    "#Columns:date(yyyy-MM-dd 24HH:mm:ss)/value(boolean|numeric|string)"};
+            String[] metaDataStr = {"Version:" + AppDatabase.VERSION,
+                                    "Name:" + category.getName(),
+                                    "Unit:" + category.getUnit(),
+                                    "Type:" + category.getRecordType(),
+                                    "DefaultValue:" + category.getDefaultValue(),
+                                    "Columns:date(yyyy-MM-dd 24HH:mm:ss)/value(boolean|numeric|string)"};
             cw.writeNext(metaDataStr);
 
             List<Record> records = category.getRecordsOrderByIdAscending();
@@ -320,17 +323,19 @@ public class MainActivity extends AppCompatActivity {
 
                 //files is the array of the paths of files selected by the Application User.
                 try {
-                    CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(files[0]), "UTF-8"), '\t');
+//                    CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(files[0]), "UTF-8"), '\t');
+                    CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(files[0]), "UTF-8"), ',');
                     String [] nextLine;
                     long lineNum = 0;
 
                     boolean dbVersionCheck = false, categoryNameCheck = false, categoryUnitCheck = false;
                     boolean categoryTypeCheck = false, defaultValueCheck = false, headerCheck = false;
-                    boolean isCategoryNameExists = false, dataCheck = false;
+                    boolean isCategoryNameExists = false, rowDataCheck = false, dataCheck = false;
                     String dbVersion = null, categoryName = null, categoryUnit = null;
                     long categoryType = -1, defaultValue = -1;
 
                     Category category = null;
+                    List<Record> records = new ArrayList<Record>();
 
                     while ((nextLine = reader.readNext()) != null) {
                         // nextLine[] is an array of values from the line
@@ -342,19 +347,18 @@ public class MainActivity extends AppCompatActivity {
 
                         if(lineNum == 0){
                             //header
-
                             Log.d("opencsv", "nextLine.length : " + nextLine.length);
                             for (int i = 0; i < nextLine.length; i++) {
                                 String[] split2 = nextLine[i].split(":");
                                 Log.d("opencsv", "split2.length : " + split2.length);
                                 Log.d("opencsv", "split2[0] : " + split2[0]);
-                                if(split2[0].replaceAll("\\s+","").equals("#Version")){
+                                if(split2[0].replaceAll("\\s+","").equals("Version")){
                                     if(split2[1] != null && !split2[1].equals("")){
                                         dbVersion = split2[1];
                                         dbVersionCheck = true;
                                     }
                                 }
-                                else if(split2[0].replaceAll("\\s+","").equals("#Name")){
+                                else if(split2[0].replaceAll("\\s+","").equals("Name")){
                                     if(split2[1] != null && !split2[1].equals("")){
                                         categoryName = split2[1];
                                         if(categoryName.length() <= Category.getMaxNameLength()) {
@@ -362,13 +366,15 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     }
                                 }
-                                else if(split2[0].replaceAll("\\s+","").equals("#Unit")){
-                                    if(split2[1] != null && !split2[1].equals("")){
+                                else if(split2[0].replaceAll("\\s+","").equals("Unit")){
+                                    if(split2.length == 1){
+                                        categoryUnitCheck = true;
+                                    }else if(split2[1] != null && !split2[1].equals("")){
                                         categoryUnit = split2[1];
                                         categoryUnitCheck = true;
                                     }
                                 }
-                                else if(split2[0].replaceAll("\\s+","").equals("#Type")){
+                                else if(split2[0].replaceAll("\\s+","").equals("Type")){
                                     if(split2[1] != null && !split2[1].equals("")){
                                         if(split2[1].equals("0") || split2[1].equals("1") || split2[1].equals("2")){
                                             categoryType = Long.parseLong(split2[1]);
@@ -376,8 +382,10 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     }
                                 }
-                                else if(split2[0].replaceAll("\\s+","").equals("#DefaultValue")){
-                                    if(split2[1] != null && !split2[1].equals("")){
+                                else if(split2[0].replaceAll("\\s+","").equals("DefaultValue")){
+                                    if(split2.length == 1){
+                                        defaultValueCheck = true;
+                                    }else if(split2[1] != null && !split2[1].equals("")){
                                         if(NumberUtils.isDigits(split2[1]) && NumberUtils.isNumber(split2[1])){
                                             defaultValue = Long.parseLong(split2[1]);
                                             Log.d("opencsv", "split2[1] : " + split2[1]);
@@ -414,7 +422,58 @@ public class MainActivity extends AppCompatActivity {
                         }
                         else{
                             //data
+                            Record record;
+                            rowDataCheck = true;
+                            if(nextLine.length != 2){
+                                rowDataCheck = false;
+                                break;
+                            }else {
+                                record = new Record();
+                                record.setRecordType(categoryType);
+                                DateTime dateTime = StaticData.fmtForBackup.parseDateTime(nextLine[0]);
+                                if (dateTime != null) {
+                                    record.setDate(new java.sql.Date(dateTime.toDate().getTime()));
+                                } else {
+                                    rowDataCheck = false;
+                                    break;
+                                }
 
+                                if (categoryType == StaticData.RECORD_TYPE_BOOLEAN) {
+                                    if (nextLine[1].equals("true")) {
+                                        record.setBool(true);
+                                    } else {
+                                        rowDataCheck = false;
+                                        break;
+                                    }
+                                } else if (categoryType == StaticData.RECORD_TYPE_NUMBER) {
+                                    if(NumberUtils.isNumber(nextLine[1]) && NumberUtils.isDigits(nextLine[1])) {
+                                        long value = Long.parseLong(nextLine[1]);
+                                        if(value > Category.getMaxValue()){
+                                            rowDataCheck = false;
+                                            break;
+                                        }
+                                        else{
+                                            record.setNumber(value);
+                                        }
+                                    } else{
+                                        dataCheck = false;
+                                        break;
+                                    }
+
+                                } else if (categoryType == StaticData.RECORD_TYPE_MEMO) {
+                                    String value = nextLine[1];
+                                    if (value.length() > Category.getMaxMemoLength()) {
+                                        rowDataCheck = false;
+                                        break;
+                                    }
+                                    else{
+                                        record.setString(nextLine[1]);
+                                    }
+                                }
+                            }
+                            if(record != null && rowDataCheck == true){
+                                records.add(record);
+                            }
                         }
                         lineNum++;
                     }
@@ -425,18 +484,18 @@ public class MainActivity extends AppCompatActivity {
                     else if(isCategoryNameExists){
                         Toast.makeText(context, "Category Name [" + categoryName + "] is already exists", Toast.LENGTH_LONG).show();
                     }
-                    else if(!dataCheck){
+                    else if(!rowDataCheck){
                         Toast.makeText(context, "Data file's record data is not correct", Toast.LENGTH_LONG).show();
                     }
                     else{
                         category.save();
-                        List<Record> records = category.getRecords();
                         for(Record record:records){
+                            record.associateCategory(category);
                             record.save();
                         }
+                        Toast.makeText(context, "Data import [ " + categoryName + " ] is completed!!", Toast.LENGTH_LONG).show();
+                        refreshList();
                     }
-
-
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

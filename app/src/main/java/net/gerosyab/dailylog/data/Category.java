@@ -315,14 +315,18 @@ public class Category extends BaseModel {
             .from(Record.class)
             .where(Record_Table.category_id.eq(id)).query();
 
-        cursor.moveToFirst();
-
-        long sum = cursor.getLong(0);
-        long cnt = this.getTotalRecordNum();
-        if(cnt > 0) {
-            return (double) sum / cnt;
+        if(cursor != null && cursor.moveToFirst() ) {
+            long sum, cnt;
+            if(cursor.getCount() > 0) {
+                sum = cursor.getLong(0);
+                cnt = this.getTotalRecordNum();
+                return (double) sum / cnt;
+            }
+            else {
+                return 0;
+            }
         }
-        else{
+        else {
             return 0;
         }
     }
@@ -330,7 +334,12 @@ public class Category extends BaseModel {
     public static long getLastOrderNum(){
         Cursor cursor =  SQLite.select(max(Category_Table.order))
                 .from(Category.class).query();
-        return cursor.getLong(0);
+        if(cursor != null && cursor.moveToFirst() ) {
+            if(cursor.getCount() > 0) {
+                return cursor.getLong(0);
+            }
+        }
+        return 0;
     }
 
     public static boolean isCategoryNameExists(String categoryNameStr){
