@@ -3,6 +3,8 @@ package net.gerosyab.dailylog.data;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created by tremolo on 2016-06-04.
  */
@@ -23,4 +25,5 @@ public class StaticData {
 
     public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
     public static final DateTimeFormatter fmtForBackup = DateTimeFormat.forPattern("yyyy-MM-dd 24HH:mm:ss");
+    public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 24HH:mm:ss");
 }

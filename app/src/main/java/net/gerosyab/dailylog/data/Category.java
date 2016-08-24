@@ -1,6 +1,7 @@
 package net.gerosyab.dailylog.data;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.raizlabs.android.dbflow.annotation.Column;
@@ -9,8 +10,10 @@ import com.raizlabs.android.dbflow.annotation.OneToMany;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.annotation.Unique;
+import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import net.gerosyab.dailylog.database.AppDatabase;
 
@@ -120,6 +123,13 @@ public class Category extends BaseModel {
 
     public static long getMaxNameLength(){ return MAX_NAME_LENGTH; }
 
+    public void deleteCategory() {
+        SQLite.delete(Record.class)
+                .where(Record_Table.category_id.eq(id))
+                .execute();
+        delete();
+    }
+
     @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
     public List<Record> getRecords() {
         if (records == null || records.isEmpty()) {
@@ -165,7 +175,7 @@ public class Category extends BaseModel {
     }
 
     public boolean hasRecord(Date date){
-        List<Record> records = SQLite.select().from(Record.class).where(Record_Table.date.eq(date)).queryList();
+        List<Record> records = SQLite.select().from(Record.class).where(Record_Table.category_id.eq(id)).and(Record_Table.date.eq(date)).queryList();
 
         if(records == null || records.isEmpty()){
             return false;
@@ -175,7 +185,7 @@ public class Category extends BaseModel {
     }
 
     public Record getRecord(Date date){
-        return SQLite.select().from(Record.class).where(Record_Table.date.eq(date)).querySingle();
+        return SQLite.select().from(Record.class).where(Record_Table.category_id.eq(id)).and(Record_Table.date.eq(date)).querySingle();
     }
 
     public DateTime getFirstRecordDateTime(){

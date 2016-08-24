@@ -40,9 +40,9 @@ public class NumberPickerDialog extends DialogFragment {
     NumberPickerDialogListener mListener;
 
     public interface NumberPickerDialogListener {
-        public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder);
-        public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder);
-        public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder);
+        public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record);
+        public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record);
+        public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record);
     }
 
     public static NumberPickerDialog newInstance(String titleStr, String valueStr, String unitStr, long maxValue, long mode, Record record){
@@ -166,12 +166,12 @@ public class NumberPickerDialog extends DialogFragment {
                             record.setNumber(Long.parseLong(valueEditText.getText().toString()));
                             Log.d("numberPicker", "positiveButton : " + record.getDate());
                             record.save();
-                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken());
+                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record);
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken());
+                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record);
                             NumberPickerDialog.this.getDialog().cancel();
                         }
                     });
@@ -182,7 +182,7 @@ public class NumberPickerDialog extends DialogFragment {
                             record.setNumber(Long.parseLong(valueEditText.getText().toString()));
                             Log.d("numberPicker", "positiveButton : " + record.getDate());
                             record.save();
-                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken());
+                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record);
                         }
                     })
                     .setNeutralButton(R.string.action_delete, new DialogInterface.OnClickListener() {
@@ -194,7 +194,7 @@ public class NumberPickerDialog extends DialogFragment {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             record.delete();
-                                            mListener.onNumberPickerDialogDeleteClick(NumberPickerDialog.this, valueEditText.getWindowToken());
+                                            mListener.onNumberPickerDialogDeleteClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record);
                                             dismiss();
                                         }
                                     })
@@ -208,7 +208,7 @@ public class NumberPickerDialog extends DialogFragment {
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken());
+                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record);
                             NumberPickerDialog.this.getDialog().cancel();
                         }
                     });

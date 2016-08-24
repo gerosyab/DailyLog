@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.roomorama.caldroid.CaldroidFragment;
@@ -35,6 +36,8 @@ import net.gerosyab.dailylog.fragment.NumberPickerDialog;
 import org.joda.time.DateTime;
 
 import java.text.DateFormatSymbols;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity implements NumberPickerDialog.NumberPickerDialogListener, MessagePopupDialog.MessagePopupDialogListener {
@@ -55,7 +58,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
     InputMethodManager imm;
     TextView globalTx;
 
-    DateTime dt;
+    DateTime calendarDt;
     final int startYear = 1900;
     final int endYear = 2100;
     final int yearLength = endYear - startYear;
@@ -103,16 +106,16 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         }
 
 //        records = category.getRecords();
-        DateTime startDayOfMonthDt, endDayOfMonthDt;
-        startDayOfMonthDt = dt.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-        endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTime(23, 59, 59, 0);
-        List<Record> records = category.getRecords(new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfMonthDt.toDate().getTime()));
-
-        for (Record record : records) {
-            java.util.Date utilDate = new java.util.Date(record.getDate().getTime());
-            caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg), utilDate);
-            caldroidFragment.setTextColorForDate(R.color.selected_cell_text_color, utilDate);
-        }
+//        DateTime startDayOfMonthDt, endDayOfMonthDt;
+//        startDayOfMonthDt = dt.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
+//        endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTime(23, 59, 59, 0);
+//        List<Record> records = category.getRecords(new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfMonthDt.toDate().getTime()));
+//
+//        for (Record record : records) {
+//            java.util.Date utilDate = new java.util.Date(record.getDate().getTime());
+//            caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg), utilDate);
+//            caldroidFragment.setTextColorForDate(R.color.selected_cell_text_color, utilDate);
+//        }
 
         changeView(CALENDER_VIEW);
     }
@@ -160,7 +163,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
     }
 
     private void initViews(){
-        dt = new DateTime();
+        calendarDt = new DateTime();
 
         if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
 
@@ -174,8 +177,8 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
 
         caldroidFragment = new CaldroidFragment();
         Bundle args = new Bundle();
-        args.putInt(CaldroidFragment.MONTH, dt.getMonthOfYear());
-        args.putInt(CaldroidFragment.YEAR, dt.getYear());
+        args.putInt(CaldroidFragment.MONTH, calendarDt.getMonthOfYear());
+        args.putInt(CaldroidFragment.YEAR, calendarDt.getYear());
         args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.MyCaldroidTheme);
         caldroidFragment.setArguments(args);
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
@@ -186,29 +189,18 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         caldroidFragment.setCaldroidListener(new CaldroidListener() {
             @Override
             public void onChangeMonth(int month, int year) {
+                Log.d("DetailActivity", "onChangeMonth() - month : " + month + ", year : " + year);
                 super.onChangeMonth(month, year);
-                int day = dt.getDayOfMonth();
-                dt = new DateTime(year, month, day, 0, 0);
                 yearTextView.setText("" + year);
                 monthTextView.setText(monthStr[month - 1]);
-
-                DateTime startDayOfPrevMonthDt, endDayOfNextMonthDt;
-                startDayOfPrevMonthDt = dt.minusMonths(1).dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-//                endDayOfMonthDt = dt.dayOfMonth().withMaximumValue().withTime(23, 59, 59, 0);
-                endDayOfNextMonthDt = dt.plusMonths(1).dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-                List<Record> records = category.getRecords(new java.sql.Date(startDayOfPrevMonthDt.toDate().getTime()), new java.sql.Date(endDayOfNextMonthDt.toDate().getTime()));
-                for (Record record : records) {
-                    java.util.Date utilDate = new java.util.Date(record.getDate().getTime());
-                    caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg), utilDate);
-                    caldroidFragment.setTextColorForDate(R.color.selected_cell_text_color, utilDate);
-                }
+                calendarDt = calendarDt.withYear(year).withMonthOfYear(month);
+                redrawCaldroid();
             }
 
             @Override
             public void onSelectDate(java.util.Date date, View view) {
                 Log.d("DetailActivity", "onSelectDate");
                 if(category.getRecordType() != StaticData.RECORD_TYPE_BOOLEAN){
-                    globalTx = (TextView) view;
                     final java.util.Date finalDate = date;
 
                     Record record = category.getRecord(new java.sql.Date(date.getTime()));
@@ -240,7 +232,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                     }
                     else{
                         //dialog 로 데이터 보여줌
-                        Log.d("DetailActivity", "Record Not Null : " + record.getDate() + ", " + record.getNumber() + ", " + record.getString() );
+                        Log.d("DetailActivity", "(" + category.getName() + ")Record Not Null : " + record.getRecordType() + ", " + record.getDate() + ", " + record.getNumber() + ", " + record.getString() );
                         //dialog 에서 edit, delete 눌러 처리
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
@@ -271,24 +263,20 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
             @Override
             public void onLongClickDate(java.util.Date date, View view) {
                 if (category.getRecordType() == StaticData.RECORD_TYPE_BOOLEAN) {
-                    TextView tx = (TextView) view;
                     Record record = category.getRecord(new java.sql.Date(date.getTime()));
                     if (record != null) {
-//                        Toast.makeText(context, "Long Clicked - record : " + record, Toast.LENGTH_LONG).show();
-                        tx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
-                        tx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
                         record.delete();
+                        Toast.makeText(context, "Record removed : " + record.getDateString(), Toast.LENGTH_LONG).show();
                     } else {
-//                        Toast.makeText(context, "Long Clicked - record null" + record, Toast.LENGTH_LONG).show();
-                        tx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
-                        tx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
                         record = new Record();
                         record.associateCategory(category);
                         record.setRecordType(StaticData.RECORD_TYPE_BOOLEAN);
                         record.setBool(true);
                         record.setDate(new java.sql.Date(date.getTime()));
                         record.save();
+                        Toast.makeText(context, "Record saved : " + record.getDateString(), Toast.LENGTH_LONG).show();
                     }
+                    redrawCaldroid();
                 }
             }
         });
@@ -296,8 +284,8 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         yearListView.setDivider(null);
         monthListView.setDivider(null);
 
-        yearTextView.setText("" + dt.getYear());
-        monthTextView.setText(dt.monthOfYear().getAsText());
+        yearTextView.setText("" + calendarDt.getYear());
+        monthTextView.setText(calendarDt.monthOfYear().getAsText());
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(category.getName());
@@ -321,7 +309,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                     yearListView.post(new Runnable() {
                         @Override
                         public void run() {
-                            yearListView.setSelection(dt.getYear() - startYear);
+                            yearListView.setSelection(calendarDt.getYear() - startYear);
                             yearListView.clearFocus();
                         }
                     });
@@ -344,7 +332,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                     monthListView.post(new Runnable() {
                         @Override
                         public void run() {
-                            monthListView.setSelection(dt.getMonthOfYear() - 1);
+                            monthListView.setSelection(calendarDt.getMonthOfYear() - 1);
                             monthListView.clearFocus();
                         }
                     });
@@ -365,8 +353,8 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         yearListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                dt = dt.withYear(startYear + position);
-                caldroidFragment.moveToDate(dt.toDate());
+                calendarDt = calendarDt.withYear(startYear + position);
+                caldroidFragment.moveToDate(calendarDt.toDate());
                 changeView(CALENDER_VIEW);
             }
         });
@@ -374,48 +362,91 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         monthListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                dt = dt.withMonthOfYear(position + 1);
-                caldroidFragment.moveToDate(dt.toDate());
+                calendarDt = calendarDt.withMonthOfYear(position + 1);
+                caldroidFragment.moveToDate(calendarDt.toDate());
                 changeView(CALENDER_VIEW);
             }
         });
     }
 
     @Override
-    public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder) {
-        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
-        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+    public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record) {
+//        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
+//        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+        Toast.makeText(context, "Record saved : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
     @Override
-    public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder) {
+    public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record) {
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
     @Override
-    public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder) {
-        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
-        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+    public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record) {
+//        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
+//        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+        Toast.makeText(context, "Record removed : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
     @Override
-    public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder) {
-        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
-        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+    public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record) {
+//        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
+//        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
+        Toast.makeText(context, "Record saved : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
     @Override
-    public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder) {
+    public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record) {
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
     @Override
-    public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder) {
-        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
-        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+    public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record) {
+//        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
+//        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
+        Toast.makeText(context, "Record removed : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
+    }
+
+    public void redrawCaldroid(){
+        DateTime nowDt = new DateTime().withTimeAtStartOfDay();
+        DateTime startDayOfMonthDt = calendarDt.dayOfMonth().withMinimumValue().withTimeAtStartOfDay().minusDays(7);
+        DateTime endDayOfNextMonthDt = calendarDt.dayOfMonth().withMaximumValue().withTimeAtStartOfDay().plusDays(7);
+
+        //clear
+        for(DateTime curDt = startDayOfMonthDt; !curDt.isEqual(endDayOfNextMonthDt); curDt = curDt.plusDays(1)){
+            Date date = curDt.toDate();
+            caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.date_cell_bg), date);
+            caldroidFragment.setTextColorForDate(R.color.date_cell_text_color, date);
+        }
+
+        List<Record> records = category.getRecords(new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfNextMonthDt.toDate().getTime()));
+
+        boolean isTodaysRecordExists = false;
+        for (Record record : records) {
+            java.util.Date utilDate = new java.util.Date(record.getDate().getTime());
+            if(nowDt.toDate().equals(utilDate)){
+                isTodaysRecordExists = true;
+                caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.today_selected_date_cell_bg), utilDate);
+            }else{
+                caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg), utilDate);
+            }
+            caldroidFragment.setTextColorForDate(R.color.selected_cell_text_color, utilDate);
+        }
+
+        if(!isTodaysRecordExists){
+            Date date = nowDt.toDate();
+            caldroidFragment.setBackgroundDrawableForDate(ContextCompat.getDrawable(context, R.drawable.today_date_cell_bg), date);
+            caldroidFragment.setTextColorForDate(R.color.date_cell_text_color, date);
+        }
+
+        caldroidFragment.refreshView();
     }
 }

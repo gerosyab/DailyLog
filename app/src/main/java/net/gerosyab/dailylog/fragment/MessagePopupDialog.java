@@ -37,9 +37,9 @@ public class MessagePopupDialog extends DialogFragment {
     MessagePopupDialogListener mListener;
 
     public interface MessagePopupDialogListener {
-        public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder);
-        public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder);
-        public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder);
+        public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record);
+        public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record);
+        public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record);
     }
 
     public static MessagePopupDialog newInstance(String titleStr, String messageStr, long maxLength, long mode, Record record){
@@ -127,15 +127,21 @@ public class MessagePopupDialog extends DialogFragment {
             builder.setView(view)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            record.setString(messageEditText.getText().toString());
-                            Log.d("messagePopup", "positiveButton : " + record.getDate());
-                            record.save();
-                            mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken());
+                            String str = messageEditText.getText().toString();
+                            if(str.length() > 0) {
+                                record.setString(str);
+                                Log.d("messagePopup", "positiveButton : " + record.getDate());
+                                record.save();
+                                mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
+                            }
+                            else{
+                                dismiss();
+                            }
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken());
+                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
                             MessagePopupDialog.this.getDialog().cancel();
                         }
                     });
@@ -146,7 +152,7 @@ public class MessagePopupDialog extends DialogFragment {
                             record.setString(messageEditText.getText().toString());
                             Log.d("messagePopup", "positiveButton : " + record.getDate());
                             record.save();
-                            mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken());
+                            mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
                         }
                     })
                     .setNeutralButton(R.string.action_delete, new DialogInterface.OnClickListener() {
@@ -158,7 +164,7 @@ public class MessagePopupDialog extends DialogFragment {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             record.delete();
-                                            mListener.onMessagePopupDialogDeleteClick(MessagePopupDialog.this, messageEditText.getWindowToken());
+                                            mListener.onMessagePopupDialogDeleteClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
                                             dismiss();
                                         }
                                     })
@@ -172,7 +178,7 @@ public class MessagePopupDialog extends DialogFragment {
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken());
+                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
                             MessagePopupDialog.this.getDialog().cancel();
                         }
                     });

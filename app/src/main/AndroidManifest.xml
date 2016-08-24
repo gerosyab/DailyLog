@@ -66,5 +66,4 @@
                 android:value=".activity.CategoryActivity" />
         </activity>
     </application>
-
 </manifest>
