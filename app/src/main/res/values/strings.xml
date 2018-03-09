@@ -3,6 +3,7 @@
     <string name="action_import">IMPORT</string>
     <string name="action_export">EXPORT</string>
     <string name="action_settings">SETTINGS</string>
+    <string name="action_license">LICENSE</string>
     <string name="action_save">SAVE</string>
     <string name="action_edit">EDIT</string>
     <string name="action_delete">DELETE</string>

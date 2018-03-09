@@ -2,8 +2,10 @@ package net.gerosyab.dailylog.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -36,7 +38,6 @@ import net.gerosyab.dailylog.fragment.NumberPickerDialog;
 import org.joda.time.DateTime;
 
 import java.text.DateFormatSymbols;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -70,6 +71,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
     ArrayAdapter<String> yearArrayAdapter;
     ArrayAdapter<String> monthArrayAdapter;
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +87,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
 
         category = SQLite.select()
                 .from(Category.class)
-                .where(Category_Table.id.eq(categoryID))
+                .where(Category_Table.categoryId.eq(categoryID))
                 .querySingle();
 
         initViews();
@@ -120,6 +122,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         changeView(CALENDER_VIEW);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private void changeView(int index){
         if(index == CALENDER_VIEW){
             visibleViewIndex = CALENDER_VIEW;
@@ -136,18 +139,18 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
             calendarContainerLinear.setVisibility(View.INVISIBLE);
             yearListView.setVisibility(View.VISIBLE);
             monthListView.setVisibility(View.INVISIBLE);
-            yearTextView.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+            yearTextView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             yearTextView.setAlpha(1f);
-            monthTextView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+            monthTextView.setTextColor(ContextCompat.getColor(context, R.color.gray));
             monthTextView.setAlpha(0.5f);
         }else if(index == MONTH_LIST_VIEW){
             visibleViewIndex = MONTH_LIST_VIEW;
             calendarContainerLinear.setVisibility(View.INVISIBLE);
             yearListView.setVisibility(View.INVISIBLE);
             monthListView.setVisibility(View.VISIBLE);
-            yearTextView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+            yearTextView.setTextColor(ContextCompat.getColor(context, R.color.gray));
             yearTextView.setAlpha(0.5f);
-            monthTextView.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+            monthTextView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             monthTextView.setAlpha(1f);
         }
     }
@@ -209,7 +212,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                         //dialog 에서 새로 입력
                         record = new Record();
                         record.setDate(new java.sql.Date(finalDate.getTime()));
-                        record.associateCategory(category);
+//                        record.associateCategory(category);
 
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
@@ -269,7 +272,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                         Toast.makeText(context, "Record removed : " + record.getDateString(), Toast.LENGTH_LONG).show();
                     } else {
                         record = new Record();
-                        record.associateCategory(category);
+//                        record.associateCategory(category);
                         record.setRecordType(StaticData.RECORD_TYPE_BOOLEAN);
                         record.setBool(true);
                         record.setDate(new java.sql.Date(date.getTime()));
@@ -345,7 +348,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
-                intent.putExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, category.getId());
+                intent.putExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, category.getCategoryId());
                 startActivity(intent);
             }
         });
@@ -369,6 +372,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
@@ -378,11 +382,13 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record) {
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
@@ -392,6 +398,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
@@ -401,11 +408,13 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record) {
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));

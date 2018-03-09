@@ -12,13 +12,12 @@
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="net.gerosyab.dailylog.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-
 
         <activity
             android:name=".activity.MainActivity"
@@ -32,8 +31,8 @@
         </activity>
         <activity
             android:name=".activity.DetailActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".activity.MainActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -44,8 +43,8 @@
         </activity>
         <activity
             android:name=".activity.CategoryActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".activity.MainActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -65,5 +64,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.CategoryActivity" />
         </activity>
+        <activity
+            android:name=".activity.LicenseActivity"
+            android:parentActivityName=".activity.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
+        </activity>
     </application>
+
 </manifest>

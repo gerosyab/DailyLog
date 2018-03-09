@@ -1,19 +1,16 @@
 package net.gerosyab.dailylog.data;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.OneToMany;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.annotation.Unique;
-import com.raizlabs.android.dbflow.sql.language.CursorResult;
+import com.raizlabs.android.dbflow.sql.language.OperatorGroup;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
-import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import net.gerosyab.dailylog.database.AppDatabase;
 
@@ -30,12 +27,10 @@ import static com.raizlabs.android.dbflow.sql.language.Method.sum;
 /**
  * Created by donghe on 2016-06-03.
  */
-@ModelContainer
 @Table(database = AppDatabase.class)
 public class Category extends BaseModel {
-    @Column
     @PrimaryKey(autoincrement = true)
-    private long id;
+    private long categoryId;
 
     @Column
     @Unique
@@ -69,12 +64,12 @@ public class Category extends BaseModel {
         this.recordType = recordType;
     }
 
-    public long getId() {
-        return id;
+    public long getCategoryId() {
+        return categoryId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getName() {
@@ -125,7 +120,7 @@ public class Category extends BaseModel {
 
     public void deleteCategory() {
         SQLite.delete(Record.class)
-                .where(Record_Table.category_id.eq(id))
+                .where(Record_Table.categoryId.eq(categoryId))
                 .execute();
         delete();
     }
@@ -135,7 +130,7 @@ public class Category extends BaseModel {
         if (records == null || records.isEmpty()) {
             records = SQLite.select()
                     .from(Record.class)
-                    .where(Record_Table.category_id.eq(id))
+                    .where(Record_Table.categoryId.eq(categoryId))
                     .queryList();
         }
         return records;
@@ -146,8 +141,8 @@ public class Category extends BaseModel {
         if (records == null || records.isEmpty()) {
             records = SQLite.select()
                     .from(Record.class)
-                    .where(Record_Table.category_id.eq(id))
-                    .orderBy(Record_Table.id, true)    //ascending
+                    .where(Record_Table.categoryId.eq(categoryId))
+                    .orderBy(Record_Table.recordId, true)    //ascending
                     .queryList();
         }
         return records;
@@ -158,24 +153,24 @@ public class Category extends BaseModel {
         if (records == null || records.isEmpty()) {
             records = SQLite.select()
                     .from(Record.class)
-                    .where(Record_Table.category_id.eq(id))
+                    .where(Record_Table.categoryId.eq(categoryId))
                     .orderBy(Record_Table.date, true)    //ascending
                     .queryList();
         }
         return records;
     }
 
-    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
+//    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
     public List<Record> getRecords(Date fromDate, Date toDate) {
             return SQLite.select()
                     .from(Record.class)
-                    .where(Record_Table.category_id.eq(id))
+                    .where(Record_Table.categoryId.eq(categoryId))
                     .and(Record_Table.date.between(fromDate).and(toDate))
                     .queryList();
     }
 
     public boolean hasRecord(Date date){
-        List<Record> records = SQLite.select().from(Record.class).where(Record_Table.category_id.eq(id)).and(Record_Table.date.eq(date)).queryList();
+        List<Record> records = SQLite.select().from(Record.class).where(Record_Table.categoryId.eq(categoryId)).and(Record_Table.date.eq(date)).queryList();
 
         if(records == null || records.isEmpty()){
             return false;
@@ -185,13 +180,13 @@ public class Category extends BaseModel {
     }
 
     public Record getRecord(Date date){
-        return SQLite.select().from(Record.class).where(Record_Table.category_id.eq(id)).and(Record_Table.date.eq(date)).querySingle();
+        return SQLite.select().from(Record.class).where(Record_Table.categoryId.eq(categoryId)).and(Record_Table.date.eq(date)).querySingle();
     }
 
     public DateTime getFirstRecordDateTime(){
        Record record = SQLite.select()
                .from(Record.class)
-               .where(Record_Table.category_id.eq(id))
+               .where(Record_Table.categoryId.eq(categoryId))
                .orderBy(Record_Table.date, true)    //ascending
                .querySingle();
 
@@ -208,7 +203,7 @@ public class Category extends BaseModel {
     public DateTime getLastRecordDateTime(){
         Record record = SQLite.select()
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
+                .where(Record_Table.categoryId.eq(categoryId))
                 .orderBy(Record_Table.date, false)    //descending
                 .querySingle();
 
@@ -223,19 +218,19 @@ public class Category extends BaseModel {
     }
 
     public long getTotalRecordNum(){
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id)).count();
+                .where(Record_Table.categoryId.eq(categoryId)).count();
     }
 
     public long getLast7RecordNum(){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusDays(7).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
-                .and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime())))
+                .where(Record_Table.categoryId.eq(categoryId))
+                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
                 .count();
     }
 
@@ -243,10 +238,10 @@ public class Category extends BaseModel {
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusDays(15).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
-                .and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime())))
+                .where(Record_Table.categoryId.eq(categoryId))
+                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
                 .count();
     }
 
@@ -254,10 +249,10 @@ public class Category extends BaseModel {
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(1).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
-                .and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime())))
+                .where(Record_Table.categoryId.eq(categoryId))
+                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
                 .count();
     }
 
@@ -265,10 +260,10 @@ public class Category extends BaseModel {
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(2).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
-                .and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime())))
+                .where(Record_Table.categoryId.eq(categoryId))
+                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
                 .count();
     }
 
@@ -276,10 +271,10 @@ public class Category extends BaseModel {
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(3).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
-                .and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime())))
+                .where(Record_Table.categoryId.eq(categoryId))
+                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
                 .count();
     }
 
@@ -287,10 +282,10 @@ public class Category extends BaseModel {
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(6).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
-                .and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime())))
+                .where(Record_Table.categoryId.eq(categoryId))
+                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
                 .count();
     }
 
@@ -298,10 +293,10 @@ public class Category extends BaseModel {
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusYears(1).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.id))
+        return SQLite.select(count(Record_Table.recordId))
                 .from(Record.class)
-                .where(Record_Table.category_id.eq(id))
-                .and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime())))
+                .where(Record_Table.categoryId.eq(categoryId))
+                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
                 .count();
     }
 
@@ -323,7 +318,7 @@ public class Category extends BaseModel {
 
             Cursor cursor = SQLite.select(sum(Record_Table.number))
             .from(Record.class)
-            .where(Record_Table.category_id.eq(id)).query();
+            .where(Record_Table.categoryId.eq(categoryId)).query();
 
         if(cursor != null && cursor.moveToFirst() ) {
             long sum, cnt;

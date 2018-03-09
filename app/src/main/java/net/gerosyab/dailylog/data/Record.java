@@ -2,14 +2,10 @@ package net.gerosyab.dailylog.data;
 
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
-import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
-import com.raizlabs.android.dbflow.annotation.ModelContainer;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.annotation.Unique;
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.structure.BaseModel;
-import com.raizlabs.android.dbflow.structure.container.ForeignKeyContainer;
 
 import net.gerosyab.dailylog.database.AppDatabase;
 
@@ -17,20 +13,18 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 
 /**
  * Created by donghe on 2016-06-03.
  */
-@ModelContainer
 @Table(database = AppDatabase.class)
-public class Record extends BaseModel{
+public class Record extends BaseModel {
     @Column
     @PrimaryKey(autoincrement =  true)
-    private long id;
+    private long recordId;
 
-    @ForeignKey(tableClass = Category.class)
-    private ForeignKeyContainer<Category> category;
+    @ForeignKey(tableClass = Category.class, stubbedRelationship = true, references = @ForeignKeyReference(columnName = "categoryId", foreignKeyColumnName = "categoryId"))
+    private long categoryId;
 
     @Column
     private long recordType;
@@ -51,21 +45,17 @@ public class Record extends BaseModel{
     public Record(){
     }
 
-    public long getId() {
-        return id;
+    public long getRecordId() {
+        return recordId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setRecordId(long recordId) {
+        this.recordId = recordId;
     }
 
-    public  ForeignKeyContainer<Category> getCategory() {
-        return category;
-    }
+    public  long getCategoryId() {return categoryId; }
 
-    public void setCategory( ForeignKeyContainer<Category> category) {
-        this.category = category;
-    }
+    public void setCategoryId( long categoryId) { this.categoryId = categoryId; }
 
     public long getRecordType() {
         return recordType;
@@ -105,10 +95,6 @@ public class Record extends BaseModel{
 
     public void setString(String string) {
         this.string = string;
-    }
-
-    public void associateCategory(Category category) {
-        this.category = FlowManager.getContainerAdapter(Category.class).toForeignKeyContainer(category);
     }
 
     public String getDateString(){

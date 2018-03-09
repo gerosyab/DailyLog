@@ -8,8 +8,8 @@
         android:title="@string/action_import"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_license"
         android:orderInCategory="200"
-        android:title="@string/action_settings"
+        android:title="@string/action_license"
         app:showAsAction="never" />
 </menu>

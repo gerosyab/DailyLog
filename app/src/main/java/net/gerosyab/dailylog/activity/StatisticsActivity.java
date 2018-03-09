@@ -69,7 +69,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         category = SQLite.select()
                 .from(Category.class)
-                .where(Category_Table.id.eq(categoryID))
+                .where(Category_Table.categoryId.eq(categoryID))
                 .querySingle();
 
         last7daysText.setText(String.valueOf(category.getLast7RecordNum()));
@@ -118,6 +118,8 @@ public class StatisticsActivity extends AppCompatActivity {
         ab.setTitle("Statistics [" + category.getName() + "]");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        fab.setVisibility(View.GONE);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

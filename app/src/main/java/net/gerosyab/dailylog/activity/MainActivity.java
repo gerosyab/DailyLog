@@ -1,6 +1,5 @@
 package net.gerosyab.dailylog.activity;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,11 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +19,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -35,14 +30,10 @@ import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import com.raizlabs.android.dbflow.config.FlowConfig;
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
-import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.StaticData;
 import net.gerosyab.dailylog.database.AppDatabase;
@@ -54,7 +45,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -63,7 +53,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -92,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
-                intent.putExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, categories.get((int) id).getId());
+                intent.putExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, categories.get((int) id).getCategoryId());
                 startActivity(intent);
             }
         });
@@ -138,8 +127,9 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_license) {
+            Intent intent = new Intent(getApplicationContext(), LicenseActivity.class);
+            startActivity(intent);
         }
         else if (id == R.id.action_import){
             //파일 선택 다이얼로그 호출
@@ -208,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
     private void editCategory(long id){
         Intent intent = new Intent(getApplicationContext(), CategoryActivity.class);
         intent.putExtra(StaticData.CATEGORY_MODE_INTENT_EXTRA, StaticData.CATEGORY_MODE_EDIT);
-        intent.putExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, categories.get((int) id).getId());
+        intent.putExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, categories.get((int) id).getCategoryId());
         startActivityForResult(intent, REQUEST_CODE_CATEGORY_ACTIVITY_EDIT);
     }
 
@@ -496,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                     else{
                         category.save();
                         for(Record record:records){
-                            record.associateCategory(category);
+//                            record.associateCategory(category);
                             record.save();
                         }
                         Toast.makeText(context, "Data import [ " + categoryName + " ] is completed!!", Toast.LENGTH_LONG).show();

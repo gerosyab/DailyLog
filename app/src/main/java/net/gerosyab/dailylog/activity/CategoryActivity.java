@@ -1,13 +1,9 @@
 package net.gerosyab.dailylog.activity;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,16 +12,13 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
 import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.StaticData;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
@@ -129,7 +122,7 @@ public class CategoryActivity extends AppCompatActivity {
         else if(categoryMode == StaticData.CATEGORY_MODE_EDIT){
             category = SQLite.select()
                     .from(Category.class)
-                    .where(Category_Table.id.eq(categoryID))
+                    .where(Category_Table.categoryId.eq(categoryID))
                     .querySingle();
 
             if(category != null) {
