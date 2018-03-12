@@ -252,7 +252,7 @@ public class MainActivity extends SuperActivity {
                                     "Columns:date(yyyy-MM-dd 24HH:mm:ss)/value(boolean|numeric|string)"};
             cw.writeNext(metaDataStr);
 
-            List<Record> records = category.getRecordsOrderByIdAscending(realm);
+            List<Record> records = category.getRecordsOrderByDateAscending(realm);
             for(Record record:records){
                 String value = null;
                 if(category.getRecordType() == StaticData.RECORD_TYPE_BOOLEAN){
