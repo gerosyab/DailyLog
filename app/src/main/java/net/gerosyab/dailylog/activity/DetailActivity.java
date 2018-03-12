@@ -2,17 +2,14 @@ package net.gerosyab.dailylog.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -23,13 +20,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
-import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.StaticData;
 import net.gerosyab.dailylog.fragment.MessagePopupDialog;
@@ -40,14 +35,14 @@ import org.joda.time.DateTime;
 import java.text.DateFormatSymbols;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
-public class DetailActivity extends AppCompatActivity implements NumberPickerDialog.NumberPickerDialogListener, MessagePopupDialog.MessagePopupDialogListener {
+public class DetailActivity extends SuperActivity implements NumberPickerDialog.NumberPickerDialogListener, MessagePopupDialog.MessagePopupDialogListener {
 
-    Context context;
     CaldroidFragment caldroidFragment;
     LinearLayout calendarContainerLinear;
     Category category;
-    long categoryID;
+    String categoryID;
     TextView yearTextView, monthTextView;
     ListView yearListView, monthListView;
     FloatingActionButton fab;
@@ -71,24 +66,20 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
     ArrayAdapter<String> yearArrayAdapter;
     ArrayAdapter<String> monthArrayAdapter;
 
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        context = getApplicationContext();
+//        if(realm == null) realm = getRealm();
+//        context = getApplicationContext();
 
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         setContentView(R.layout.activity_detail);
 
         Intent intent = getIntent();
-        categoryID = intent.getLongExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, -1);
+        categoryID = intent.getStringExtra(StaticData.CATEGORY_ID_INTENT_EXTRA);
 
-        category = SQLite.select()
-                .from(Category.class)
-                .where(Category_Table.categoryId.eq(categoryID))
-                .querySingle();
+        category = Category.getCategory(realm, categoryID);
 
         initViews();
 
@@ -122,7 +113,6 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         changeView(CALENDER_VIEW);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private void changeView(int index){
         if(index == CALENDER_VIEW){
             visibleViewIndex = CALENDER_VIEW;
@@ -206,13 +196,13 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                 if(category.getRecordType() != StaticData.RECORD_TYPE_BOOLEAN){
                     final java.util.Date finalDate = date;
 
-                    Record record = category.getRecord(new java.sql.Date(date.getTime()));
+                    Record record = category.getRecord(realm, new java.sql.Date(date.getTime()));
                     if(record == null) {
                         Log.d("DetailActivity", "Record Null");
                         //dialog 에서 새로 입력
                         record = new Record();
                         record.setDate(new java.sql.Date(finalDate.getTime()));
-//                        record.associateCategory(category);
+                        record.setCategoryId(categoryID);
 
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
@@ -224,12 +214,12 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                         if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
                             record.setRecordType(StaticData.RECORD_TYPE_NUMBER);
                             NumberPickerDialog dialog = NumberPickerDialog.newInstance(record.getDateString(), "" + category.getDefaultValue(),
-                                                            category.getUnit(), category.getMaxValue(), StaticData.DIALOG_MODE_CREATE, record);
+                                                            category.getUnit(), category.getMaxValue(), StaticData.DIALOG_MODE_CREATE, record, realm);
                             dialog.show(ft, "numberPickerDialog");
                         }else if(category.getRecordType() == StaticData.RECORD_TYPE_MEMO){
                             record.setRecordType(StaticData.RECORD_TYPE_MEMO);
                             MessagePopupDialog dialog = MessagePopupDialog.newInstance(record.getDateString(), "",
-                                    category.getMaxMemoLength(), StaticData.DIALOG_MODE_CREATE, record);
+                                    category.getMaxMemoLength(), StaticData.DIALOG_MODE_CREATE, record, realm);
                             dialog.show(ft, "messagePopupDialog");
                         }
                     }
@@ -245,11 +235,11 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
                         ft.addToBackStack(null);
                         if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
                             NumberPickerDialog dialog = NumberPickerDialog.newInstance(record.getDateString(), "" + record.getNumber(),
-                                    category.getUnit(), category.getMaxValue(), StaticData.DIALOG_MODE_EDIT, record);
+                                    category.getUnit(), category.getMaxValue(), StaticData.DIALOG_MODE_EDIT, record, realm);
                             dialog.show(ft, "numberPickerDialog");
                         }else if(category.getRecordType() == StaticData.RECORD_TYPE_MEMO){
                             MessagePopupDialog dialog = MessagePopupDialog.newInstance(record.getDateString(), record.getString(),
-                                    category.getMaxMemoLength(), StaticData.DIALOG_MODE_EDIT, record);
+                                    category.getMaxMemoLength(), StaticData.DIALOG_MODE_EDIT, record, realm);
                             dialog.show(ft, "messagePopupDialog");
                         }
                     }
@@ -266,17 +256,22 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
             @Override
             public void onLongClickDate(java.util.Date date, View view) {
                 if (category.getRecordType() == StaticData.RECORD_TYPE_BOOLEAN) {
-                    Record record = category.getRecord(new java.sql.Date(date.getTime()));
+                    Record record = category.getRecord(realm, new java.sql.Date(date.getTime()));
                     if (record != null) {
-                        record.delete();
                         Toast.makeText(context, "Record removed : " + record.getDateString(), Toast.LENGTH_LONG).show();
+                        realm.beginTransaction();
+                        record.deleteFromRealm();
+                        realm.commitTransaction();
+
                     } else {
-                        record = new Record();
-//                        record.associateCategory(category);
+
+                        realm.beginTransaction();
+                        record = realm.createObject(Record.class, UUID.randomUUID().toString());
+                        record.setCategoryId(categoryID);
                         record.setRecordType(StaticData.RECORD_TYPE_BOOLEAN);
                         record.setBool(true);
                         record.setDate(new java.sql.Date(date.getTime()));
-                        record.save();
+                        realm.commitTransaction();
                         Toast.makeText(context, "Record saved : " + record.getDateString(), Toast.LENGTH_LONG).show();
                     }
                     redrawCaldroid();
@@ -372,54 +367,48 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
-    public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record) {
+    public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder, String dateString) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
 //        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
-        Toast.makeText(context, "Record saved : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Record saved : " + dateString, Toast.LENGTH_LONG).show();
         redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
-    public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record) {
+    public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder) {
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
-    public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record) {
+    public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder, String dateString) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
 //        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
-        Toast.makeText(context, "Record removed : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Record removed : " + dateString, Toast.LENGTH_LONG).show();
         redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
-    public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record) {
+    public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder, String dateString) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_date_cell_bg));
 //        globalTx.setTextColor(ContextCompat.getColor(context, R.color.selected_cell_text_color));
-        Toast.makeText(context, "Record saved : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Record saved : " + dateString, Toast.LENGTH_LONG).show();
         redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
-    public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record) {
+    public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder) {
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
-    public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record) {
+    public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder, String dateString) {
 //        globalTx.setBackground(ContextCompat.getDrawable(context, R.drawable.date_cell_bg));
 //        globalTx.setTextColor(ContextCompat.getColor(context, R.color.cell_text_color));
-        Toast.makeText(context, "Record removed : " + record.getDateString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Record removed : " + dateString, Toast.LENGTH_LONG).show();
         redrawCaldroid();
         imm.hideSoftInputFromWindow(iBinder, 0);
     }
@@ -436,7 +425,7 @@ public class DetailActivity extends AppCompatActivity implements NumberPickerDia
             caldroidFragment.setTextColorForDate(R.color.date_cell_text_color, date);
         }
 
-        List<Record> records = category.getRecords(new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfNextMonthDt.toDate().getTime()));
+        List<Record> records = category.getRecords(realm, new java.sql.Date(startDayOfMonthDt.toDate().getTime()), new java.sql.Date(endDayOfNextMonthDt.toDate().getTime()));
 
         boolean isTodaysRecordExists = false;
         for (Record record : records) {

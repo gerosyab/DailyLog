@@ -25,9 +25,10 @@ import net.gerosyab.dailylog.view.AutoRepeatImageView;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-/**
- * Created by tremolo on 2016-08-19.
- */
+import java.util.UUID;
+
+import io.realm.Realm;
+
 public class NumberPickerDialog extends DialogFragment {
 
     AutoRepeatImageView minusImageView, plusImageView;
@@ -36,16 +37,17 @@ public class NumberPickerDialog extends DialogFragment {
     long maxValue, mode;
     String titleStr, valueStr, unitStr;
     Record record;
+    Realm realm;
 
     NumberPickerDialogListener mListener;
 
     public interface NumberPickerDialogListener {
-        public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record);
-        public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record);
-        public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record);
+        public void onNumberPickerDialogPositiveClick(DialogFragment dialog, IBinder iBinder, String dateStr);
+        public void onNumberPickerDialogNegativeClick(DialogFragment dialog, IBinder iBinder);
+        public void onNumberPickerDialogDeleteClick(DialogFragment dialog, IBinder iBinder, String dateStr);
     }
 
-    public static NumberPickerDialog newInstance(String titleStr, String valueStr, String unitStr, long maxValue, long mode, Record record){
+    public static NumberPickerDialog newInstance(String titleStr, String valueStr, String unitStr, long maxValue, long mode, Record record, Realm realm){
         NumberPickerDialog dialog = new NumberPickerDialog();
 
         Bundle args = new Bundle();
@@ -56,12 +58,17 @@ public class NumberPickerDialog extends DialogFragment {
         args.putLong("mode", mode);
         dialog.setArguments(args);
         dialog.setRecord(record);
+        dialog.setRealm(realm);
 
         return dialog;
     }
 
     public void setRecord(Record record){
         this.record = record;
+    }
+
+    public void setRealm(Realm realm){
+        this.realm = realm;
     }
 
     @Override
@@ -163,15 +170,21 @@ public class NumberPickerDialog extends DialogFragment {
             builder.setView(view)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            record.setNumber(Long.parseLong(valueEditText.getText().toString()));
+                            realm.beginTransaction();
+                            Record newRecord = realm.createObject(Record.class, UUID.randomUUID().toString());
+                            newRecord.setNumber(Long.parseLong(valueEditText.getText().toString()));
+                            newRecord.setCategoryId(record.getCategoryId());
+                            newRecord.setDate(record.getDate());
+//                            record.setNumber(Long.parseLong(valueEditText.getText().toString()));
                             Log.d("numberPicker", "positiveButton : " + record.getDate());
-                            record.save();
-                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record);
+                            realm.insert(newRecord);
+                            realm.commitTransaction();
+                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record.getDateString());
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record);
+                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken());
                             NumberPickerDialog.this.getDialog().cancel();
                         }
                     });
@@ -179,10 +192,12 @@ public class NumberPickerDialog extends DialogFragment {
             builder.setView(view)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            realm.beginTransaction();
                             record.setNumber(Long.parseLong(valueEditText.getText().toString()));
                             Log.d("numberPicker", "positiveButton : " + record.getDate());
-                            record.save();
-                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record);
+                            realm.insertOrUpdate(record);
+                            realm.commitTransaction();
+                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record.getDateString());
                         }
                     })
                     .setNeutralButton(R.string.action_delete, new DialogInterface.OnClickListener() {
@@ -193,8 +208,11 @@ public class NumberPickerDialog extends DialogFragment {
                                     .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            record.delete();
-                                            mListener.onNumberPickerDialogDeleteClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record);
+                                            String dateString = record.getDateString();
+                                            realm.beginTransaction();
+                                            record.deleteFromRealm();
+                                            realm.commitTransaction();
+                                            mListener.onNumberPickerDialogDeleteClick(NumberPickerDialog.this, valueEditText.getWindowToken(), dateString);
                                             dismiss();
                                         }
                                     })
@@ -208,7 +226,7 @@ public class NumberPickerDialog extends DialogFragment {
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record);
+                            mListener.onNumberPickerDialogNegativeClick(NumberPickerDialog.this, valueEditText.getWindowToken());
                             NumberPickerDialog.this.getDialog().cancel();
                         }
                     });

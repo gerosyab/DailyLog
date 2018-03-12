@@ -1,20 +1,25 @@
 package net.gerosyab.dailylog;
 
 import android.app.Application;
-
-import com.raizlabs.android.dbflow.config.FlowConfig;
-import com.raizlabs.android.dbflow.config.FlowManager;
+import android.os.Build;
 
 import net.gerosyab.dailylog.database.AppDatabase;
 
-/**
- * Created by tremolo on 2016-06-05.
- */
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
+
 public class DailyLogApplication extends Application{
 
     @Override
     public void onCreate() {
         super.onCreate();
-        FlowManager.init(new FlowConfig.Builder(this).build());
+        Realm.init(this);
+
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .name("dailylog.realm")
+                .schemaVersion(AppDatabase.VERSION)
+                .build();
+        Realm.setDefaultConfiguration(config);
     }
 }

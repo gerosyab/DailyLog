@@ -1,58 +1,41 @@
 package net.gerosyab.dailylog.data;
 
-import android.database.Cursor;
 import android.util.Log;
-
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.OneToMany;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.annotation.Unique;
-import com.raizlabs.android.dbflow.sql.language.OperatorGroup;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.BaseModel;
-
-import net.gerosyab.dailylog.database.AppDatabase;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import java.sql.Date;
-import java.util.List;
 
-import static com.raizlabs.android.dbflow.sql.language.Method.count;
-import static com.raizlabs.android.dbflow.sql.language.Method.max;
-import static com.raizlabs.android.dbflow.sql.language.Method.sum;
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.RealmResults;
+import io.realm.Sort;
+import io.realm.annotations.Index;
+import io.realm.annotations.PrimaryKey;
 
-/**
- * Created by donghe on 2016-06-03.
- */
-@Table(database = AppDatabase.class)
-public class Category extends BaseModel {
-    @PrimaryKey(autoincrement = true)
-    private long categoryId;
+public class Category extends RealmObject{
+    @PrimaryKey
+    private String categoryId;
 
-    @Column
-    @Unique
+    @Index
     private String name;
 
-    @Column
     private String unit;
 
-    @Column
     private long order;
 
-    @Column
     private long recordType;
 
-    @Column
     private long defaultValue;
 
     private static final long MAX_VALUE = 99999;
     private static final long MAX_MEMO_LENGTH = 500;
-    private static final long MAX_NAME_LENGTH = 50;
+    private static final long MAX_CATEGORY_NAME_LENGTH = 50;
+    private static final long MAX_UNIT_NAME_LENGTH = 20;
 
-    List<Record> records;
+    RealmList<Record> records;
 
     public Category() {
     }
@@ -64,11 +47,11 @@ public class Category extends BaseModel {
         this.recordType = recordType;
     }
 
-    public long getCategoryId() {
+    public String getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(long categoryId) {
+    public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -116,61 +99,68 @@ public class Category extends BaseModel {
 
     public static long getMaxMemoLength(){ return MAX_MEMO_LENGTH; }
 
-    public static long getMaxNameLength(){ return MAX_NAME_LENGTH; }
+    public static long getMaxCategoryNameLength(){ return MAX_CATEGORY_NAME_LENGTH; }
 
-    public void deleteCategory() {
-        SQLite.delete(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .execute();
-        delete();
+    public static long getMaxUnitNameLength(){ return MAX_UNIT_NAME_LENGTH; }
+
+    public void deleteCategory(Realm realm) {
+        realm.beginTransaction();
+        RealmResults<Record> records = realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll();
+        records.deleteAllFromRealm();
+
+        RealmResults<Category> category = realm.where(Category.class)
+                .equalTo("categoryId", categoryId)
+                .findAll();
+        category.deleteAllFromRealm();
+        realm.commitTransaction();
     }
 
-    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
-    public List<Record> getRecords() {
-        if (records == null || records.isEmpty()) {
-            records = SQLite.select()
-                    .from(Record.class)
-                    .where(Record_Table.categoryId.eq(categoryId))
-                    .queryList();
-        }
-        return records;
+    public static RealmResults<Category> getCategories(Realm realm) {
+        return realm.where(Category.class)
+                .findAll();
     }
 
-    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
-    public List<Record> getRecordsOrderByIdAscending() {
-        if (records == null || records.isEmpty()) {
-            records = SQLite.select()
-                    .from(Record.class)
-                    .where(Record_Table.categoryId.eq(categoryId))
-                    .orderBy(Record_Table.recordId, true)    //ascending
-                    .queryList();
-        }
-        return records;
+    public static Category getCategory(Realm realm, String categoryId){
+        return realm.where(Category.class)
+                .equalTo("categoryId", categoryId)
+                .findFirst();
     }
 
-    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
-    public List<Record> getRecordsOrderByDateAscending() {
-        if (records == null || records.isEmpty()) {
-            records = SQLite.select()
-                    .from(Record.class)
-                    .where(Record_Table.categoryId.eq(categoryId))
-                    .orderBy(Record_Table.date, true)    //ascending
-                    .queryList();
-        }
-        return records;
+    public RealmResults<Record> getRecords(Realm realm) {
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll();
     }
 
-//    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "records")
-    public List<Record> getRecords(Date fromDate, Date toDate) {
-            return SQLite.select()
-                    .from(Record.class)
-                    .where(Record_Table.categoryId.eq(categoryId))
-                    .and(Record_Table.date.between(fromDate).and(toDate))
-                    .queryList();
+    public RealmResults<Record> getRecordsOrderByIdAscending(Realm realm) {
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll()
+                .sort("recordId", Sort.ASCENDING);
     }
 
-    public boolean hasRecord(Date date){
-        List<Record> records = SQLite.select().from(Record.class).where(Record_Table.categoryId.eq(categoryId)).and(Record_Table.date.eq(date)).queryList();
+    public RealmResults<Record> getRecordsOrderByDateAscending(Realm realm) {
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll()
+                .sort("date", Sort.ASCENDING);
+    }
+
+    public RealmResults<Record> getRecords(Realm realm, Date fromDate, Date toDate) {
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", fromDate, toDate)
+                .findAll()
+                .sort("date", Sort.ASCENDING);
+    }
+
+    public boolean hasRecord(Realm realm, Date date){
+        RealmResults<Record> records = realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .equalTo("date", date)
+                .findAll();
 
         if(records == null || records.isEmpty()){
             return false;
@@ -179,130 +169,118 @@ public class Category extends BaseModel {
         }
     }
 
-    public Record getRecord(Date date){
-        return SQLite.select().from(Record.class).where(Record_Table.categoryId.eq(categoryId)).and(Record_Table.date.eq(date)).querySingle();
+    public Record getRecord(Realm realm, Date date){
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .equalTo("date", date)
+                .findFirst();
     }
 
-    public DateTime getFirstRecordDateTime(){
-       Record record = SQLite.select()
-               .from(Record.class)
-               .where(Record_Table.categoryId.eq(categoryId))
-               .orderBy(Record_Table.date, true)    //ascending
-               .querySingle();
-
-        if(record == null){
+    public DateTime getFirstRecordDateTime(Realm realm){
+        java.util.Date firstRecordDate = realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll().minDate("date");
+        if(firstRecordDate == null){
             Log.d("Statistic", "getFirstRecordDateTime is null");
             return null;
-        }
-        else{
+        } else{
             Log.d("Statistic", "getFirstRecordDateTime is not null");
-            return new DateTime(record.getDate());
+            return new DateTime(firstRecordDate);
         }
     }
 
-    public DateTime getLastRecordDateTime(){
-        Record record = SQLite.select()
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .orderBy(Record_Table.date, false)    //descending
-                .querySingle();
-
-        if(record == null){
-            Log.d("Statistic", "getlastRecordDateTime is null");
+    public DateTime getLastRecordDateTime(Realm realm){
+        java.util.Date firstRecordDate = realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll().maxDate("date");
+        if(firstRecordDate == null){
+            Log.d("Statistic", "getLastRecordDateTime is null");
             return null;
-        }
-        else{
-            Log.d("Statistic", "getlastRecordDateTime is not null");
-            return new DateTime(record.getDate());
+        } else{
+            Log.d("Statistic", "getLastRecordDateTime is not null");
+            return new DateTime(firstRecordDate);
         }
     }
 
-    public long getTotalRecordNum(){
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId)).count();
+    public long getTotalRecordNum(Realm realm){
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll().size();
     }
 
-    public long getLast7RecordNum(){
+    public long getLast7RecordNum(Realm realm){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusDays(7).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
-                .count();
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", new java.sql.Date(fromDate.toDate().getTime()), new java.sql.Date(toDate.toDate().getTime()))
+                .findAll().size();
     }
 
-    public long getLast15DaysRecordNum(){
+    public long getLast15DaysRecordNum(Realm realm){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusDays(15).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
-                .count();
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", new java.sql.Date(fromDate.toDate().getTime()), new java.sql.Date(toDate.toDate().getTime()))
+                .findAll().size();
     }
 
-    public long getLastMonthRecordNum(){
+    public long getLastMonthRecordNum(Realm realm){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(1).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
-                .count();
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", new java.sql.Date(fromDate.toDate().getTime()), new java.sql.Date(toDate.toDate().getTime()))
+                .findAll().size();
     }
 
-    public long getLast2MonthsRecordNum(){
+    public long getLast2MonthsRecordNum(Realm realm){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(2).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
-                .count();
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", new java.sql.Date(fromDate.toDate().getTime()), new java.sql.Date(toDate.toDate().getTime()))
+                .findAll().size();
     }
 
-    public long getLast3MonthsRecordNum(){
+    public long getLast3MonthsRecordNum(Realm realm){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(3).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
-                .count();
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", new java.sql.Date(fromDate.toDate().getTime()), new java.sql.Date(toDate.toDate().getTime()))
+                .findAll().size();
     }
 
-    public long getLast6MonthsRecordNum(){
+    public long getLast6MonthsRecordNum(Realm realm){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusMonths(6).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
-                .count();
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", new java.sql.Date(fromDate.toDate().getTime()), new java.sql.Date(toDate.toDate().getTime()))
+                .findAll().size();
     }
 
-    public long getLastYearRecordNum(){
+    public long getLastYearRecordNum(Realm realm){
         DateTime toDate = new DateTime().withTimeAtStartOfDay();
         DateTime fromDate = toDate.minusYears(1).withTimeAtStartOfDay();
 
-        return SQLite.select(count(Record_Table.recordId))
-                .from(Record.class)
-                .where(Record_Table.categoryId.eq(categoryId))
-                .and(OperatorGroup.clause().and(Record_Table.date.between(new java.sql.Date(fromDate.toDate().getTime())).and(new java.sql.Date(toDate.toDate().getTime()))))
-                .count();
+        return realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .between("date", new java.sql.Date(fromDate.toDate().getTime()), new java.sql.Date(toDate.toDate().getTime()))
+                .findAll().size();
     }
 
-    public Period getRecordPeriod(){
-        DateTime firstRecordDateTime = this.getFirstRecordDateTime();
-        DateTime lastRecordDateTime = this.getLastRecordDateTime();
+    public Period getRecordPeriod(Realm realm){
+        DateTime firstRecordDateTime = this.getFirstRecordDateTime(realm);
+        DateTime lastRecordDateTime = this.getLastRecordDateTime(realm);
 
         if(firstRecordDateTime != null && lastRecordDateTime != null) {
             Period period = new Period(firstRecordDateTime.toInstant(), lastRecordDateTime.toInstant());
@@ -314,49 +292,38 @@ public class Category extends BaseModel {
 
     }
 
-    public double getAverage(){
+    public double getAverage(Realm realm){
+        RealmResults<Record> results = realm.where(Record.class)
+                .equalTo("categoryId", categoryId)
+                .findAll();
 
-            Cursor cursor = SQLite.select(sum(Record_Table.number))
-            .from(Record.class)
-            .where(Record_Table.categoryId.eq(categoryId)).query();
-
-        if(cursor != null && cursor.moveToFirst() ) {
-            long sum, cnt;
-            if(cursor.getCount() > 0) {
-                sum = cursor.getLong(0);
-                cnt = this.getTotalRecordNum();
-                return (double) sum / cnt;
-            }
-            else {
-                return 0;
-            }
+        if(results != null && !results.isEmpty()) {
+            return results.average("number");
         }
         else {
             return 0;
         }
     }
 
-    public static long getLastOrderNum(){
-        Cursor cursor =  SQLite.select(max(Category_Table.order))
-                .from(Category.class).query();
-        if(cursor != null && cursor.moveToFirst() ) {
-            if(cursor.getCount() > 0) {
-                return cursor.getLong(0);
-            }
+    public static long getLastOrderNum(Realm realm){
+        RealmResults<Category> results = realm.where(Category.class)
+                .findAll();
+        if(results != null && !results.isEmpty() ) {
+            return results.max("order").longValue();
         }
         return 0;
     }
 
-    public static boolean isCategoryNameExists(String categoryNameStr){
-        List<Category> categories =SQLite.select(Category_Table.name)
-                .from(Category.class)
-                .queryList();
-        for(Category category : categories){
-            if(categoryNameStr.equals(category.getName())){
-                return true;
-            }
+    public static boolean isCategoryNameExists(Realm realm, String categoryNameStr){
+        Category category = realm.where(Category.class)
+                .equalTo("name", categoryNameStr)
+                .findFirst();
+        if(category != null){
+            return true;
         }
-        return false;
+        else {
+            return false;
+        }
     }
 }
 

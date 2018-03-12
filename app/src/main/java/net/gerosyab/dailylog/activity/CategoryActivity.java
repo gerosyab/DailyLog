@@ -12,18 +12,16 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.raizlabs.android.dbflow.sql.language.SQLite;
-
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
-import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.StaticData;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
+import java.util.UUID;
 
-public class CategoryActivity extends AppCompatActivity {
+public class CategoryActivity extends SuperActivity {
     long categoryMode;
     View rootView;
     EditText categoryNameEditText, unitEditText, defaultValueEditText;
@@ -35,13 +33,13 @@ public class CategoryActivity extends AppCompatActivity {
     String defaultValueStr = "";
     long defaultValueNum;
     long recordType;
-    long categoryNum;
-    long categoryID;
+    String categoryID;
     long categoryOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if(realm == null) realm = getRealm();
         setContentView(R.layout.activity_category);
 
         rootView = (View)findViewById(R.id.categoryRootView);
@@ -56,8 +54,8 @@ public class CategoryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         categoryMode = intent.getLongExtra(StaticData.CATEGORY_MODE_INTENT_EXTRA, StaticData.CATEGORY_MODE_CREATE);
-        categoryNum = intent.getLongExtra(StaticData.CATEGORY_NUM_INTENT_EXTRA, 0);
-        categoryID = intent.getLongExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, -1);
+//        categoryNum = intent.getLongExtra(StaticData.CATEGORY_NUM_INTENT_EXTRA, 0);
+        categoryID = intent.getStringExtra(StaticData.CATEGORY_ID_INTENT_EXTRA);
         categoryOrder = intent.getLongExtra(StaticData.CATEGORY_ORDER_INTENT_EXTRA, 0);
 
         ActionBar ab = getSupportActionBar();
@@ -108,7 +106,6 @@ public class CategoryActivity extends AppCompatActivity {
 
         //View Intialization
         if(categoryMode == StaticData.CATEGORY_MODE_CREATE){
-            category = new Category("", "", categoryOrder, StaticData.RECORD_TYPE_BOOLEAN);
             radioButton1.setChecked(true);
             radioButton2.setChecked(false);
             radioButton3.setChecked(false);
@@ -120,10 +117,7 @@ public class CategoryActivity extends AppCompatActivity {
 //            category.setRecordType(recordType);
         }
         else if(categoryMode == StaticData.CATEGORY_MODE_EDIT){
-            category = SQLite.select()
-                    .from(Category.class)
-                    .where(Category_Table.categoryId.eq(categoryID))
-                    .querySingle();
+            category = Category.getCategory(realm, categoryID);
 
             if(category != null) {
                 categoryNameEditText.setText(category.getName());
@@ -175,25 +169,24 @@ public class CategoryActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-
         if (id == R.id.action_save) {
-
             categoryNameStr= categoryNameEditText.getText().toString();
 
+            // category name checking
             if(categoryNameStr.equalsIgnoreCase("")){
                 Toast.makeText(getApplicationContext(), "Category Name must be specified", Toast.LENGTH_LONG).show();
                 return true;
-            }else if(categoryNameStr.length() > Category.getMaxNameLength()){
-                Toast.makeText(getApplicationContext(), "The maximum length of Category Name is 50 characters", Toast.LENGTH_LONG).show();
+            }else if(categoryNameStr.length() > Category.getMaxCategoryNameLength()){
+                Toast.makeText(getApplicationContext(), "The maximum length of Category Name is " + Category.getMaxCategoryNameLength() +" characters", Toast.LENGTH_LONG).show();
                 return true;
-            }else if(Category.isCategoryNameExists(categoryNameStr)){
+            }else if(Category.isCategoryNameExists(realm, categoryNameStr)){
                 if(categoryMode == StaticData.CATEGORY_MODE_CREATE) {
                     Toast.makeText(getApplicationContext(), "Category Name \"" + categoryNameStr + "\" already exists", Toast.LENGTH_LONG).show();
                     return true;
                 }
             }
 
+            // unit name and default value checking (NUMERIC TYPE)
             if(radioButton2.isChecked()) {
 
                 unitStr = categoryNameEditText.getText().toString();
@@ -201,8 +194,8 @@ public class CategoryActivity extends AppCompatActivity {
                 if(unitStr.equalsIgnoreCase("")){
                     Toast.makeText(getApplicationContext(), "Unit must be specified if the record type is numeric", Toast.LENGTH_LONG).show();
                     return true;
-                }else if(unitStr.length() > 20){
-                    Toast.makeText(getApplicationContext(), "The maximum length of Unit is 20 characters", Toast.LENGTH_LONG).show();
+                }else if(unitStr.length() > Category.getMaxUnitNameLength()){
+                    Toast.makeText(getApplicationContext(), "The maximum length of Unit is " + Category.getMaxUnitNameLength() + " characters", Toast.LENGTH_LONG).show();
                     return true;
                 }
 
@@ -211,7 +204,7 @@ public class CategoryActivity extends AppCompatActivity {
                 if(defaultValueStr == null || defaultValueStr.equalsIgnoreCase("")){
                     Toast.makeText(getApplicationContext(), "Default value has to be specified if the record type is numeric", Toast.LENGTH_LONG).show();
                     return true;
-                }else if(!NumberUtils.isNumber(defaultValueStr)){
+                }else if(!NumberUtils.isCreatable(defaultValueStr)){
                     Toast.makeText(getApplicationContext(), "Default value has to be numeric value", Toast.LENGTH_LONG).show();
                     return true;
                 }
@@ -229,8 +222,14 @@ public class CategoryActivity extends AppCompatActivity {
             //같은 이름의 카테고리가 있는지 확인
 
             // DB 신규 저장 or 업데이트 처리
+            realm.beginTransaction();
+            if(categoryMode == StaticData.CATEGORY_MODE_CREATE) {
+                category = realm.createObject(Category.class, UUID.randomUUID().toString());
+            }
+//            category = new Category("", "", categoryOrder, StaticData.RECORD_TYPE_BOOLEAN);
             category.setName(categoryNameStr);
             category.setUnit(unitStr);
+
             if(defaultValueStr == null || defaultValueStr.equalsIgnoreCase("")){
                 category.setDefaultValue(0);
             }else {
@@ -238,12 +237,14 @@ public class CategoryActivity extends AppCompatActivity {
             }
             category.setRecordType(recordType);
             if(categoryMode == StaticData.CATEGORY_MODE_CREATE){
-                category.setOrder(categoryNum + 1);
+                category.setOrder(categoryOrder);
             }
             else if(categoryMode == StaticData.CATEGORY_MODE_EDIT){
 
             }
-            category.save();
+
+            realm.insertOrUpdate(category);
+            realm.commitTransaction();
             setResult(RESULT_OK);
             finish();
             return true;

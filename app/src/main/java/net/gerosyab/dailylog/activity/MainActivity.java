@@ -1,7 +1,6 @@
 package net.gerosyab.dailylog.activity;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -30,7 +28,6 @@ import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
@@ -53,22 +50,24 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+import io.realm.RealmResults;
 
-    Context context;
-    private static List<Category> categories;
+public class MainActivity extends SuperActivity {
+
+//    private static List<Category> categories;
+    private static RealmResults<Category> categories;
     ListView listView;
     ArrayAdapter<String> adapter;
     final static int REQUEST_CODE_CATEGORY_ACTIVITY_CREATE = 123;
     final static int REQUEST_CODE_CATEGORY_ACTIVITY_EDIT = 456;
-
     FilePickerDialog dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getApplicationContext();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -168,10 +167,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void refreshList(){
-        categories = SQLite.select()
-                .from(Category.class)
-                .where()
-                .queryList();
+//        if(realm == null) realm = getRealm();
+        categories = Category.getCategories(realm);
 
         adapter.clear();
 
@@ -209,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Category category = categories.get((int)id);
-                category.deleteCategory();
+                category.deleteCategory(realm);
                 refreshList();
             }
         })
@@ -255,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
                                     "Columns:date(yyyy-MM-dd 24HH:mm:ss)/value(boolean|numeric|string)"};
             cw.writeNext(metaDataStr);
 
-            List<Record> records = category.getRecordsOrderByIdAscending();
+            List<Record> records = category.getRecordsOrderByIdAscending(realm);
             for(Record record:records){
                 String value = null;
                 if(category.getRecordType() == StaticData.RECORD_TYPE_BOOLEAN){
@@ -319,6 +316,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //files is the array of the paths of files selected by the Application User.
                 try {
+                    String newCategoryUUID = UUID.randomUUID().toString();
 //                    CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(files[0]), "UTF-8"), '\t');
                     CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(files[0]), "UTF-8"), ',');
                     String [] nextLine;
@@ -330,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
                     String dbVersion = null, categoryName = null, categoryUnit = null;
                     long categoryType = -1, defaultValue = -1;
 
-                    Category category = null;
+//                    Category category = null;
                     List<Record> records = new ArrayList<Record>();
 
                     while ((nextLine = reader.readNext()) != null) {
@@ -357,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                                 else if(split2[0].replaceAll("\\s+","").equals("Name")){
                                     if(split2[1] != null && !split2[1].equals("")){
                                         categoryName = split2[1];
-                                        if(categoryName.length() <= Category.getMaxNameLength()) {
+                                        if(categoryName.length() <= Category.getMaxCategoryNameLength()) {
                                             categoryNameCheck = true;
                                         }
                                     }
@@ -408,12 +406,12 @@ public class MainActivity extends AppCompatActivity {
                             if(!headerCheck){
                                 break; //header parsing, data checking failed
                             }
-                            else if (Category.isCategoryNameExists(categoryName)){
+                            else if (Category.isCategoryNameExists(realm, categoryName)){
                                 isCategoryNameExists = true;
                                 break;
                             }
                             else{
-                                category = new Category(categoryName, categoryUnit, Category.getLastOrderNum(), categoryType);
+//                                category = new Category(categoryName, categoryUnit, Category.getLastOrderNum(realm), categoryType);
                             }
                         }
                         else{
@@ -468,6 +466,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             if(record != null && rowDataCheck == true){
+                                record.setCategoryId(newCategoryUUID);
                                 records.add(record);
                             }
                         }
@@ -484,11 +483,15 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(context, "Data file's record data is not correct", Toast.LENGTH_LONG).show();
                     }
                     else{
-                        category.save();
-                        for(Record record:records){
-//                            record.associateCategory(category);
-                            record.save();
-                        }
+                        realm.beginTransaction();
+                        Category category = realm.createObject(Category.class, newCategoryUUID);
+                        category.setName(categoryName);
+                        category.setUnit(categoryUnit);
+                        category.setOrder(Category.getLastOrderNum(realm));
+                        category.setRecordType(categoryType);
+                        realm.insert(category);
+                        realm.insertOrUpdate(records);
+                        realm.commitTransaction();
                         Toast.makeText(context, "Data import [ " + categoryName + " ] is completed!!", Toast.LENGTH_LONG).show();
                         refreshList();
                     }

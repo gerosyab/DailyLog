@@ -9,22 +9,16 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.raizlabs.android.dbflow.sql.language.SQLite;
-
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Category;
-import net.gerosyab.dailylog.data.Category_Table;
 import net.gerosyab.dailylog.data.StaticData;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
-/**
- * Created by donghe on 2016-06-07.
- */
-public class StatisticsActivity extends AppCompatActivity {
+public class StatisticsActivity extends SuperActivity {
     Category category;
-    long categoryID;
+    String categoryID;
 
     TextView last7daysText;
     TextView last15daysText;
@@ -47,6 +41,7 @@ public class StatisticsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if(realm == null) realm = getRealm();
         setContentView(R.layout.activity_statistics);
         last7daysText = (TextView)findViewById(R.id.last7DaysText);
         last15daysText = (TextView)findViewById(R.id.last15DaysText);
@@ -65,25 +60,22 @@ public class StatisticsActivity extends AppCompatActivity {
         debugText = (TextView)findViewById(R.id.debugText);
 
         Intent intent = getIntent();
-        categoryID = intent.getLongExtra(StaticData.CATEGORY_ID_INTENT_EXTRA, -1);
+        categoryID = intent.getStringExtra(StaticData.CATEGORY_ID_INTENT_EXTRA);
 
-        category = SQLite.select()
-                .from(Category.class)
-                .where(Category_Table.categoryId.eq(categoryID))
-                .querySingle();
+        category = Category.getCategory(realm, categoryID);
 
-        last7daysText.setText(String.valueOf(category.getLast7RecordNum()));
-        last15daysText.setText(String.valueOf(category.getLast15DaysRecordNum()));
-        lastMonthText.setText(String.valueOf(category.getLastMonthRecordNum()));
-        last2MonthsText.setText(String.valueOf(category.getLast2MonthsRecordNum()));
-        last3MonthsText.setText(String.valueOf(category.getLast3MonthsRecordNum()));
-        last6MonthsText.setText(String.valueOf(category.getLast6MonthsRecordNum()));
-        lastYearText.setText(String.valueOf(category.getLastYearRecordNum()));
+        last7daysText.setText(String.valueOf(category.getLast7RecordNum(realm)));
+        last15daysText.setText(String.valueOf(category.getLast15DaysRecordNum(realm)));
+        lastMonthText.setText(String.valueOf(category.getLastMonthRecordNum(realm)));
+        last2MonthsText.setText(String.valueOf(category.getLast2MonthsRecordNum(realm)));
+        last3MonthsText.setText(String.valueOf(category.getLast3MonthsRecordNum(realm)));
+        last6MonthsText.setText(String.valueOf(category.getLast6MonthsRecordNum(realm)));
+        lastYearText.setText(String.valueOf(category.getLastYearRecordNum(realm)));
 
-        totalRecordNumText.setText(String.valueOf(category.getTotalRecordNum()));
+        totalRecordNumText.setText(String.valueOf(category.getTotalRecordNum(realm)));
 
-        DateTime firstRecordDateTime = category.getFirstRecordDateTime();
-        DateTime lastRecordDateTime = category.getLastRecordDateTime();
+        DateTime firstRecordDateTime = category.getFirstRecordDateTime(realm);
+        DateTime lastRecordDateTime = category.getLastRecordDateTime(realm);
 
         if(firstRecordDateTime == null){
             firstRecordDateText.setText("-");
@@ -98,11 +90,11 @@ public class StatisticsActivity extends AppCompatActivity {
             lastRecordDateText.setText(StaticData.fmt.print(lastRecordDateTime));
         }
         if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER){
-            averageValueText.setText(String.valueOf(category.getAverage()));
+            averageValueText.setText(String.valueOf(category.getAverage(realm)));
         }else{
             averageLinearLayout.setVisibility(View.GONE);
         }
-        Period period = category.getRecordPeriod();
+        Period period = category.getRecordPeriod(realm);
         if(period != null) {
             periodText.setText(period.getYears() + " year(s) " + period.getMonths() + " month(s)\n\r" + period.getWeeks() + " week(s) " + period.getDays() + " day(s)");
         }else{

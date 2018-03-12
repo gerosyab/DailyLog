@@ -23,9 +23,10 @@ import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.StaticData;
 import net.gerosyab.dailylog.view.AutoRepeatImageView;
 
-/**
- * Created by tremolo on 2016-08-19.
- */
+import java.util.UUID;
+
+import io.realm.Realm;
+
 public class MessagePopupDialog extends DialogFragment {
 
     EditText messageEditText;
@@ -33,16 +34,17 @@ public class MessagePopupDialog extends DialogFragment {
     String titleStr, messageStr, characterCountStr;
     long maxLength, mode;
     Record record;
+    Realm realm;
 
     MessagePopupDialogListener mListener;
 
     public interface MessagePopupDialogListener {
-        public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder, Record record);
-        public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder, Record record);
-        public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder, Record record);
+        public void onMessagePopupDialogPositiveClick(DialogFragment dialog, IBinder iBinder, String dateStr);
+        public void onMessagePopupDialogNegativeClick(DialogFragment dialog, IBinder iBinder);
+        public void onMessagePopupDialogDeleteClick(DialogFragment dialog, IBinder iBinder, String dateStr);
     }
 
-    public static MessagePopupDialog newInstance(String titleStr, String messageStr, long maxLength, long mode, Record record){
+    public static MessagePopupDialog newInstance(String titleStr, String messageStr, long maxLength, long mode, Record record, Realm realm){
         MessagePopupDialog dialog = new MessagePopupDialog();
 
         Bundle args = new Bundle();
@@ -52,12 +54,17 @@ public class MessagePopupDialog extends DialogFragment {
         args.putLong("mode", mode);
         dialog.setArguments(args);
         dialog.setRecord(record);
+        dialog.setRealm(realm);
 
         return dialog;
     }
 
     public void setRecord(Record record){
         this.record = record;
+    }
+
+    public void setRealm(Realm realm){
+        this.realm = realm;
     }
 
     @Override
@@ -129,10 +136,16 @@ public class MessagePopupDialog extends DialogFragment {
                         public void onClick(DialogInterface dialog, int id) {
                             String str = messageEditText.getText().toString();
                             if(str.length() > 0) {
-                                record.setString(str);
-                                Log.d("messagePopup", "positiveButton : " + record.getDate());
-                                record.save();
-                                mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
+                                realm.beginTransaction();
+                                Record newRecord = realm.createObject(Record.class, UUID.randomUUID().toString());
+                                newRecord.setString(str);
+                                newRecord.setCategoryId(record.getCategoryId());
+                                newRecord.setDate(record.getDate());
+//                                record.setString(str);
+//                                Log.d("messagePopup", "positiveButton : " + record.getDate());
+                                realm.insert(newRecord);
+                                realm.commitTransaction();
+                                mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record.getDateString());
                             }
                             else{
                                 dismiss();
@@ -141,7 +154,7 @@ public class MessagePopupDialog extends DialogFragment {
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
+                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken());
                             MessagePopupDialog.this.getDialog().cancel();
                         }
                     });
@@ -149,10 +162,12 @@ public class MessagePopupDialog extends DialogFragment {
             builder.setView(view)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            realm.beginTransaction();
                             record.setString(messageEditText.getText().toString());
                             Log.d("messagePopup", "positiveButton : " + record.getDate());
-                            record.save();
-                            mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
+                            realm.insertOrUpdate(record);
+                            realm.commitTransaction();
+                            mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record.getDateString());
                         }
                     })
                     .setNeutralButton(R.string.action_delete, new DialogInterface.OnClickListener() {
@@ -163,8 +178,11 @@ public class MessagePopupDialog extends DialogFragment {
                                     .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            record.delete();
-                                            mListener.onMessagePopupDialogDeleteClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
+                                            String dateString = record.getDateString();
+                                            realm.beginTransaction();
+                                            record.deleteFromRealm();
+                                            realm.commitTransaction();
+                                            mListener.onMessagePopupDialogDeleteClick(MessagePopupDialog.this, messageEditText.getWindowToken(), dateString);
                                             dismiss();
                                         }
                                     })
@@ -178,7 +196,7 @@ public class MessagePopupDialog extends DialogFragment {
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record);
+                            mListener.onMessagePopupDialogNegativeClick(MessagePopupDialog.this, messageEditText.getWindowToken());
                             MessagePopupDialog.this.getDialog().cancel();
                         }
                     });

@@ -1,61 +1,49 @@
 package net.gerosyab.dailylog.data;
 
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.ForeignKey;
-import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.structure.BaseModel;
-
-import net.gerosyab.dailylog.database.AppDatabase;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.sql.Date;
+//import java.sql.Date;
 
-/**
- * Created by donghe on 2016-06-03.
- */
-@Table(database = AppDatabase.class)
-public class Record extends BaseModel {
-    @Column
-    @PrimaryKey(autoincrement =  true)
-    private long recordId;
+import java.util.Date;
 
-    @ForeignKey(tableClass = Category.class, stubbedRelationship = true, references = @ForeignKeyReference(columnName = "categoryId", foreignKeyColumnName = "categoryId"))
-    private long categoryId;
+import io.realm.RealmObject;
+import io.realm.annotations.Index;
+import io.realm.annotations.PrimaryKey;
 
-    @Column
+public class Record extends RealmObject{
+    @PrimaryKey
+    private String recordId;
+
+    @Index
+    private String categoryId;
+
     private long recordType;
 
-    @Column
+    @Index
     private Date date;
 
-    //Value
-    @Column
     private boolean bool;
 
-    @Column
     private long number;
 
-    @Column
     private String string;
 
     public Record(){
     }
 
-    public long getRecordId() {
+    public String getRecordId() {
         return recordId;
     }
 
-    public void setRecordId(long recordId) {
+    public void setRecordId(String recordId) {
         this.recordId = recordId;
     }
 
-    public  long getCategoryId() {return categoryId; }
+    public  String getCategoryId() {return categoryId; }
 
-    public void setCategoryId( long categoryId) { this.categoryId = categoryId; }
+    public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
 
     public long getRecordType() {
         return recordType;

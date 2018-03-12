@@ -1,6 +1,7 @@
 Joda Time (http://www.joda.org/joda-time/)
 opencsv (http://opencsv.sourceforge.net/)
 Apache Commons Lang (https://commons.apache.org/proper/commons-lang/)
+Realm (https://github.com/realm/realm-java)
 Android Opensource Project (https://developer.android.com/)
 
  Apache License
@@ -221,29 +222,70 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -------------------------------------------------------------------------------
-DBFlow (https://github.com/Raizlabs/DBFlow)
 
-The MIT License (MIT)
+REALM COMPONENTS
 
-Copyright (c) 2014 Raizlabs
+This software contains components with separate copyright and license terms.
+Your use of these components is subject to the terms and conditions of the
+following licenses.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+For the Realm Platform Extensions component
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+  Realm Platform Extensions License
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+  Copyright (c) 2011-2017 Realm Inc All rights reserved
+
+  Redistribution and use in binary form, with or without modification, is
+  permitted provided that the following conditions are met:
+
+  1. You agree not to attempt to decompile, disassemble, reverse engineer or
+  otherwise discover the source code from which the binary code was derived.
+  You may, however, access and obtain a separate license for most of the
+  source code from which this Software was created, at
+  http://realm.io/pricing/.
+
+  2. Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+  3. Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+EXPORT COMPLIANCE
+
+You understand that the Software may contain cryptographic functions that may be
+subject to export restrictions, and you represent and warrant that you are not
+(i) located in a jurisdiction that is subject to United States economic
+sanctions (“Prohibited Jurisdiction”), including Cuba, Iran, North Korea,
+Sudan, Syria or the Crimea region, (ii) a person listed on any U.S. government
+blacklist (to include the List of Specially Designated Nationals and Blocked
+Persons or the Consolidated Sanctions List administered by the U.S. Department
+of the Treasury’s Office of Foreign Assets Control, or the Denied Persons List
+or Entity List administered by the U.S. Department of Commerce)
+(“Sanctioned Person”), or (iii) controlled or 50% or more owned by a Sanctioned
+Person.
+
+You agree to comply with all export, re-export and import restrictions and
+regulations of the U.S. Department of Commerce or other agency or authority of
+the United States or other applicable countries. You also agree not to transfer,
+or authorize the transfer of, directly or indirectly, of the Software to any
+Prohibited Jurisdiction, or otherwise in violation of any such restrictions or
+regulations.
 -------------------------------------------------------------------------------
 Caldroid (https://github.com/roomorama/Caldroid)
 
