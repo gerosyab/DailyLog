@@ -467,6 +467,7 @@ public class MainActivity extends SuperActivity {
                             }
                             if(record != null && rowDataCheck == true){
                                 record.setCategoryId(newCategoryUUID);
+                                record.setRecordId(UUID.randomUUID().toString());
                                 records.add(record);
                             }
                         }
