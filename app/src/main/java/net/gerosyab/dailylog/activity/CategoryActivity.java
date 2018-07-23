@@ -2,7 +2,6 @@ package net.gerosyab.dailylog.activity;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +17,6 @@ import net.gerosyab.dailylog.data.StaticData;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.List;
 import java.util.UUID;
 
 public class CategoryActivity extends SuperActivity {
@@ -31,15 +29,12 @@ public class CategoryActivity extends SuperActivity {
     String categoryNameStr = "";
     String unitStr = "";
     String defaultValueStr = "";
-    long defaultValueNum;
     long recordType;
     String categoryID;
-    long categoryOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if(realm == null) realm = getRealm();
         setContentView(R.layout.activity_category);
 
         rootView = (View)findViewById(R.id.categoryRootView);
@@ -54,9 +49,7 @@ public class CategoryActivity extends SuperActivity {
 
         Intent intent = getIntent();
         categoryMode = intent.getLongExtra(StaticData.CATEGORY_MODE_INTENT_EXTRA, StaticData.CATEGORY_MODE_CREATE);
-//        categoryNum = intent.getLongExtra(StaticData.CATEGORY_NUM_INTENT_EXTRA, 0);
         categoryID = intent.getStringExtra(StaticData.CATEGORY_ID_INTENT_EXTRA);
-        categoryOrder = intent.getLongExtra(StaticData.CATEGORY_ORDER_INTENT_EXTRA, 0);
 
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
@@ -114,7 +107,6 @@ public class CategoryActivity extends SuperActivity {
             defaultValueTitleTextView.setEnabled(false);
             defaultValueEditText.setEnabled(false);
             recordType = StaticData.RECORD_TYPE_BOOLEAN;
-//            category.setRecordType(recordType);
         }
         else if(categoryMode == StaticData.CATEGORY_MODE_EDIT){
             category = Category.getCategory(realm, categoryID);
@@ -219,14 +211,15 @@ public class CategoryActivity extends SuperActivity {
                 defaultValueStr="";
             }
 
-            //같은 이름의 카테고리가 있는지 확인
+            //신규 카테고리의 경우 transaction 시작 전에 새로운 order 값 확인
+            long newOrder = -1;
+            if(categoryMode == StaticData.CATEGORY_MODE_CREATE) newOrder =  Category.getNewOrderNum(realm);
 
             // DB 신규 저장 or 업데이트 처리
             realm.beginTransaction();
             if(categoryMode == StaticData.CATEGORY_MODE_CREATE) {
                 category = realm.createObject(Category.class, UUID.randomUUID().toString());
             }
-//            category = new Category("", "", categoryOrder, StaticData.RECORD_TYPE_BOOLEAN);
             category.setName(categoryNameStr);
             category.setUnit(unitStr);
 
@@ -237,12 +230,8 @@ public class CategoryActivity extends SuperActivity {
             }
             category.setRecordType(recordType);
             if(categoryMode == StaticData.CATEGORY_MODE_CREATE){
-                category.setOrder(categoryOrder);
+                category.setOrder(newOrder);
             }
-            else if(categoryMode == StaticData.CATEGORY_MODE_EDIT){
-
-            }
-
             realm.insertOrUpdate(category);
             realm.commitTransaction();
             setResult(RESULT_OK);
