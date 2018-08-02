@@ -181,7 +181,7 @@ public class CategoryActivity extends SuperActivity {
             // unit name and default value checking (NUMERIC TYPE)
             if(radioButton2.isChecked()) {
 
-                unitStr = categoryNameEditText.getText().toString();
+                unitStr = unitEditText.getText().toString();
 
                 if(unitStr.equalsIgnoreCase("")){
                     Toast.makeText(getApplicationContext(), "Unit must be specified if the record type is numeric", Toast.LENGTH_LONG).show();
@@ -212,8 +212,9 @@ public class CategoryActivity extends SuperActivity {
             }
 
             //신규 카테고리의 경우 transaction 시작 전에 새로운 order 값 확인
-            long newOrder = -1;
-            if(categoryMode == StaticData.CATEGORY_MODE_CREATE) newOrder =  Category.getNewOrderNum(realm);
+            long order;
+            if(categoryMode == StaticData.CATEGORY_MODE_CREATE) order =  Category.getNewOrderNum(realm);
+            else order = category.getOrder();
 
             // DB 신규 저장 or 업데이트 처리
             realm.beginTransaction();
@@ -230,7 +231,7 @@ public class CategoryActivity extends SuperActivity {
             }
             category.setRecordType(recordType);
             if(categoryMode == StaticData.CATEGORY_MODE_CREATE){
-                category.setOrder(newOrder);
+                category.setOrder(order);
             }
             realm.insertOrUpdate(category);
             realm.commitTransaction();
