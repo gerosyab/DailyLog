@@ -1,5 +1,7 @@
 package net.gerosyab.dailylog.util;
 
+import android.content.Context;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,5 +27,12 @@ public class Util {
             fields.addAll(Arrays.asList(c.getDeclaredFields()));
         }
         return fields;
+    }
+
+    public static int dpToPx(Context context, int dp) {
+        float density = context.getResources()
+                .getDisplayMetrics()
+                .density;
+        return Math.round((float) dp * density);
     }
 }
