@@ -78,8 +78,8 @@ public class StatisticsActivity extends SuperActivity {
     private static final int CHART_TYPE_DAILY = 0, CHART_TYPE_WEEKLY = 1, CHART_TYPE_MONTHLY = 2, CHART_TYPE_YEARLY = 3;
 
     private static final float xAxisTextSize = 14f;
+    private static final float xAxisValueTextSize = 12f;
     private static final float barValueTextSize = 14f;
-    private static final float barMonthValueTextSize = 12f;
     private static final float lineValueTextSize = 14f;
     private static final float legendFormSize = 12f;
     private static final float legendTextSize = 14f;
@@ -466,7 +466,7 @@ public class StatisticsActivity extends SuperActivity {
             BarDataSet barDataSet = new BarDataSet(barEntries, "Record Count");
             barDataSet.setColor(ContextCompat.getColor(this, R.color.bar_chart_color));
             barDataSet.setValueTextColor(ContextCompat.getColor(this, R.color.bar_chart_text_color));
-            barDataSet.setValueTextSize(barMonthValueTextSize);
+            barDataSet.setValueTextSize(barValueTextSize);
 //            barDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
             if(category.getRecordType() == StaticData.RECORD_TYPE_NUMBER) {
@@ -563,7 +563,11 @@ public class StatisticsActivity extends SuperActivity {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
-        xAxis.setTextSize(xAxisTextSize);
+        if(spinner.getSelectedItemPosition() == 2) { // 2: Month
+            xAxis.setTextSize(xAxisValueTextSize);
+        } else {
+            xAxis.setTextSize(xAxisTextSize);
+        }
         xAxis.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
         xAxis.setValueFormatter(formatter);
         xAxis.setGranularity(1f);
