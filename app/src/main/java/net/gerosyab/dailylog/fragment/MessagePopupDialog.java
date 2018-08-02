@@ -2,6 +2,7 @@ package net.gerosyab.dailylog.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.StaticData;
+import net.gerosyab.dailylog.util.MyLog;
 import net.gerosyab.dailylog.view.AutoRepeatImageView;
 
 import java.util.UUID;
@@ -82,7 +84,7 @@ public class MessagePopupDialog extends DialogFragment {
         maxLength = getArguments().getLong("maxLength");
         mode = getArguments().getLong("mode");
 
-        Log.d("messagePopup", "messageStr : " + messageStr + ", maxLength : " + maxLength + ", mode : " + mode);
+        MyLog.d("messagePopup", "messageStr : " + messageStr + ", maxLength : " + maxLength + ", mode : " + mode);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -115,17 +117,17 @@ public class MessagePopupDialog extends DialogFragment {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                Log.d("messagePopup", "beforeTextChanged entry: " + s + ", " + start + ", " + count + ", " + after);
+                MyLog.d("messagePopup", "beforeTextChanged entry: " + s + ", " + start + ", " + count + ", " + after);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("messagePopup", "onTextChanged entry: " + s + ", " + start + ", " + before + ", " + count);
+                MyLog.d("messagePopup", "onTextChanged entry: " + s + ", " + start + ", " + before + ", " + count);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                Log.d("messagePopup", "afterTextChanged entry: " + s);
+                MyLog.d("messagePopup", "afterTextChanged entry: " + s);
                 characterCountTextView.setText(s.length() + " / " + maxLength);
             }
         });
@@ -142,7 +144,7 @@ public class MessagePopupDialog extends DialogFragment {
                                 newRecord.setCategoryId(record.getCategoryId());
                                 newRecord.setDate(record.getDate());
 //                                record.setString(str);
-//                                Log.d("messagePopup", "positiveButton : " + record.getDate());
+//                                MyLog.d("messagePopup", "positiveButton : " + record.getDate());
                                 realm.insert(newRecord);
                                 realm.commitTransaction();
                                 mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record.getDateString());
@@ -162,12 +164,37 @@ public class MessagePopupDialog extends DialogFragment {
             builder.setView(view)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            realm.beginTransaction();
-                            record.setString(messageEditText.getText().toString());
-                            Log.d("messagePopup", "positiveButton : " + record.getDate());
-                            realm.insertOrUpdate(record);
-                            realm.commitTransaction();
-                            mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record.getDateString());
+                            String str = messageEditText.getText().toString();
+                            if(str.length() > 0) {
+                                realm.beginTransaction();
+                                record.setString(str);
+                                MyLog.d("messagePopup", "positiveButton : " + record.getDate());
+                                realm.insertOrUpdate(record);
+                                realm.commitTransaction();
+                                mListener.onMessagePopupDialogPositiveClick(MessagePopupDialog.this, messageEditText.getWindowToken(), record.getDateString());
+                            }
+                            else{
+//                                dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setMessage(getResources().getString(R.string.dialog_message_confirm_delete_record) + " [" + record.getDateString() + "]")
+                                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String dateString = record.getDateString();
+                                                realm.beginTransaction();
+                                                record.deleteFromRealm();
+                                                realm.commitTransaction();
+                                                mListener.onMessagePopupDialogDeleteClick(MessagePopupDialog.this, messageEditText.getWindowToken(), dateString);
+                                                dismiss();
+                                            }
+                                        })
+                                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        }).show();
+                            }
                         }
                     })
                     .setNeutralButton(R.string.action_delete, new DialogInterface.OnClickListener() {
@@ -205,19 +232,32 @@ public class MessagePopupDialog extends DialogFragment {
         return builder.create();
     }
 
+//    @Override
+//    public void onAttach(Activity activity) {
+//        super.onAttach(activity);
+//        // Verify that the host activity implements the callback interface
+//        try {
+//            // Instantiate the NoticeDialogListener so we can send events to the host
+//            mListener = (MessagePopupDialogListener) activity;
+//        } catch (ClassCastException e) {
+//            // The activity doesn't implement the interface, throw exception
+//            throw new ClassCastException(activity.toString()
+//                    + " must implement MessagePopupDialogListener");
+//        }
+//    }
+
+
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the NoticeDialogListener so we can send events to the host
-            mListener = (MessagePopupDialogListener) activity;
+            mListener = (MessagePopupDialogListener) context;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement MessagePopupDialogListener");
         }
-
     }
-
 }

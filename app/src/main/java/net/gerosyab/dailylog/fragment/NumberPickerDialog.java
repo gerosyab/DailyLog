@@ -2,6 +2,7 @@ package net.gerosyab.dailylog.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import net.gerosyab.dailylog.R;
 import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.StaticData;
+import net.gerosyab.dailylog.util.MyLog;
 import net.gerosyab.dailylog.view.AutoRepeatImageView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -108,17 +110,17 @@ public class NumberPickerDialog extends DialogFragment {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                Log.d("numberPicker", "beforeTextChanged entry: " + s + ", " + start + ", " + count + ", " + after);
+                MyLog.d("numberPicker", "beforeTextChanged entry: " + s + ", " + start + ", " + count + ", " + after);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("numberPicker", "onTextChanged entry: " + s + ", " + start + ", " + before + ", " + count);
+                MyLog.d("numberPicker", "onTextChanged entry: " + s + ", " + start + ", " + before + ", " + count);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                Log.d("numberPicker", "afterTextChanged entry: " + s);
+                MyLog.d("numberPicker", "afterTextChanged entry: " + s);
                 if (s.toString().length() == 0) {
                     s.append("0");
                 }
@@ -138,7 +140,7 @@ public class NumberPickerDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 long value = Long.parseLong(valueEditText.getText().toString());
-                Log.d("numberPicker", "minusImageView.setOnClickListener : " + value);
+                MyLog.d("numberPicker", "minusImageView.setOnClickListener : " + value);
                 if(value == 0){
 
                 }
@@ -154,7 +156,7 @@ public class NumberPickerDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 long value = Long.parseLong(valueEditText.getText().toString());
-                Log.d("numberPicker", "plusImageView.setOnClickListener : " + value);
+                MyLog.d("numberPicker", "plusImageView.setOnClickListener : " + value);
                 if(value == maxValue){
 
                 }
@@ -170,16 +172,22 @@ public class NumberPickerDialog extends DialogFragment {
             builder.setView(view)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            realm.beginTransaction();
-                            Record newRecord = realm.createObject(Record.class, UUID.randomUUID().toString());
-                            newRecord.setNumber(Long.parseLong(valueEditText.getText().toString()));
-                            newRecord.setCategoryId(record.getCategoryId());
-                            newRecord.setDate(record.getDate());
-//                            record.setNumber(Long.parseLong(valueEditText.getText().toString()));
-                            Log.d("numberPicker", "positiveButton : " + record.getDate());
-                            realm.insert(newRecord);
-                            realm.commitTransaction();
-                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record.getDateString());
+                            long value = Long.parseLong(valueEditText.getText().toString());
+                            if(value > 0) {
+                                realm.beginTransaction();
+                                Record newRecord = realm.createObject(Record.class, UUID.randomUUID().toString());
+                                newRecord.setNumber(value);
+                                newRecord.setCategoryId(record.getCategoryId());
+                                newRecord.setDate(record.getDate());
+                                //                            record.setNumber(Long.parseLong(valueEditText.getText().toString()));
+                                MyLog.d("numberPicker", "positiveButton : " + record.getDate());
+                                realm.insert(newRecord);
+                                realm.commitTransaction();
+                                mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record.getDateString());
+                            }
+                            else {
+                                dismiss();
+                            }
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -192,12 +200,35 @@ public class NumberPickerDialog extends DialogFragment {
             builder.setView(view)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            realm.beginTransaction();
-                            record.setNumber(Long.parseLong(valueEditText.getText().toString()));
-                            Log.d("numberPicker", "positiveButton : " + record.getDate());
-                            realm.insertOrUpdate(record);
-                            realm.commitTransaction();
-                            mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this,  valueEditText.getWindowToken(), record.getDateString());
+                            long value = Long.parseLong(valueEditText.getText().toString());
+                            if(value > 0) {
+                                realm.beginTransaction();
+                                record.setNumber(Long.parseLong(valueEditText.getText().toString()));
+                                MyLog.d("numberPicker", "positiveButton : " + record.getDate());
+                                realm.insertOrUpdate(record);
+                                realm.commitTransaction();
+                                mListener.onNumberPickerDialogPositiveClick(NumberPickerDialog.this, valueEditText.getWindowToken(), record.getDateString());
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setMessage(getResources().getString(R.string.dialog_message_confirm_delete_record) + " [" + record.getDateString() + "]")
+                                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String dateString = record.getDateString();
+                                                realm.beginTransaction();
+                                                record.deleteFromRealm();
+                                                realm.commitTransaction();
+                                                mListener.onNumberPickerDialogDeleteClick(NumberPickerDialog.this, valueEditText.getWindowToken(), dateString);
+                                                dismiss();
+                                            }
+                                        })
+                                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        }).show();
+                            }
                         }
                     })
                     .setNeutralButton(R.string.action_delete, new DialogInterface.OnClickListener() {
@@ -235,19 +266,31 @@ public class NumberPickerDialog extends DialogFragment {
         return builder.create();
     }
 
+//    @Override
+//    public void onAttach(Activity activity) {
+//        super.onAttach(activity);
+//        // Verify that the host activity implements the callback interface
+//        try {
+//            // Instantiate the NoticeDialogListener so we can send events to the host
+//            mListener = (NumberPickerDialogListener) activity;
+//        } catch (ClassCastException e) {
+//            // The activity doesn't implement the interface, throw exception
+//            throw new ClassCastException(activity.toString()
+//                    + " must implement NumberPickerDialogListener");
+//        }
+//    }
+
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the NoticeDialogListener so we can send events to the host
-            mListener = (NumberPickerDialogListener) activity;
+            mListener = (NumberPickerDialogListener) context;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement NumberPickerDialogListener");
         }
-
     }
-
 }
