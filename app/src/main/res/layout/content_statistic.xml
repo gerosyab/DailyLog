@@ -8,7 +8,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.StatisticsActivity"
     tools:showIn="@layout/activity_statistics">
 
@@ -20,350 +19,510 @@
         android:layout_alignParentTop="true">
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="1.0dip"
-                android:layout_marginBottom="5.0dip"
-                android:background="#ff000000" />
-            <TextView
-                style="@style/statisticTitleText"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20.0dip"
-                android:text="Trend Analysis" />
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="1.0dip"
-                android:layout_marginBottom="5.0dip"
-                android:background="#ff000000" />
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last 7 Days" />
-
-                <TextView
-                    android:id="@+id/last7DaysText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last 15 days" />
-
-                <TextView
-                    android:id="@+id/last15DaysText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last Month" />
-
-                <TextView
-                    android:id="@+id/lastMonthText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last 2 Months" />
-
-                <TextView
-                    android:id="@+id/last2MonthsText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last 3 Months" />
-
-                <TextView
-                    android:id="@+id/last3MonthsText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last 6 Months" />
-
-                <TextView
-                    android:id="@+id/last6MonthsText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last Year" />
-
-                <TextView
-                    android:id="@+id/lastYearText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
 
             <View
-                android:layout_width="fill_parent"
-                android:layout_height="1.0dip"
-                android:layout_marginTop="15.0dip"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:background="#ff000000" />
 
             <TextView
                 style="@style/statisticTitleText"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20.0dip"
-                android:text="Records" />
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="1.0dip"
-                android:layout_marginBottom="5.0dip"
-                android:background="#ff000000" />
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Total Records" />
-
-                <TextView
-                    android:id="@+id/totalRecordsText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="0" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="First Recorded" />
-
-                <TextView
-                    android:id="@+id/firstRecordDateText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="None" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Last Recorded" />
-
-                <TextView
-                    android:id="@+id/lastRecordDateText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="None" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/averageLinearLayout"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Average Value" />
-
-                <TextView
-                    android:id="@+id/averageText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="None" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="20.0dip"
-                android:paddingRight="20.0dip">
-
-                <TextView
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:gravity="left"
-                    android:text="Record Period" />
-
-                <TextView
-                    android:id="@+id/periodText"
-                    style="@style/statisticItemText"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.0"
-                    android:gravity="right"
-                    android:text="None" />
-            </LinearLayout>
-
-            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/debugText"/>
+                android:paddingLeft="20dp"
+                android:text="Trend Chart" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="#ff000000" />
+
+            <com.github.mikephil.charting.charts.CombinedChart
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/stat_chart_height" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Spinner
+                android:id="@+id/chart_date_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:layout_gravity="center"/>
+                <!--android:gravity="center"-->
+                <!--android:textAlignment="center"-->
+
+            <ImageButton
+                android:id="@+id/chart_prev_period_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:src="@drawable/baseline_navigate_before_black_24"/>
+            <ImageButton
+                android:id="@+id/chart_next_period_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:src="@drawable/baseline_navigate_next_black_24"/>
+            <!--<ImageButton
+                android:id="@+id/chart_zoom_out_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/baseline_zoom_out_black_24"/>
+            <ImageButton
+                android:id="@+id/chart_zoom_in_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/baseline_zoom_in_black_24"/>-->
+        </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="#ff000000" />
+
+            <TextView
+                style="@style/statisticTitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:text="Recent Trend Analysis" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="#ff000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="@dimen/stat_linear_horizontal_margin"
+                android:layout_marginRight="@dimen/stat_linear_horizontal_margin"
+                android:layout_marginTop="@dimen/stat_linear_vertical_margin"
+                android:layout_marginBottom="@dimen/stat_linear_vertical_margin"
+                >
+
+                <LinearLayout
+                    android:id="@+id/TrendColumn1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyTitleText"
+                        android:text="Period" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyText"
+                        android:text="7 Days" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyText"
+                        android:text="15 Days" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyText"
+                        android:text="Month" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyText"
+                        android:text="2 Months" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyText"
+                        android:text="3 Months" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyText"
+                        android:text="6 Months" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemKeyText"
+                        android:text="Year" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/TrendColumn2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueTitleText"
+                        android:text="Record" />
+
+                    <TextView
+                        android:id="@+id/recent7DaysNumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+
+                    <TextView
+                        android:id="@+id/recent15DaysNumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="1" />
+
+                    <TextView
+                        android:id="@+id/recentMonthNumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="2" />
+
+                    <TextView
+                        android:id="@+id/recent2MonthsNumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="3" />
+
+                    <TextView
+                        android:id="@+id/recent3MonthsNumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="4" />
+
+                    <TextView
+                        android:id="@+id/recent6MonthsNumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="5" />
+
+                    <TextView
+                        android:id="@+id/recentYearNumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="6" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/TrendColumn3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueTitleText"
+                        android:text="Average" />
+
+                    <TextView
+                        android:id="@+id/recent7DaysAvgText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+
+                    <TextView
+                        android:id="@+id/recent15DaysAvgText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="1" />
+
+                    <TextView
+                        android:id="@+id/recentMonthAvgText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="2" />
+
+                    <TextView
+                        android:id="@+id/recent2MonthsAvgText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="3" />
+
+                    <TextView
+                        android:id="@+id/recent3MonthsAvgText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="4" />
+
+                    <TextView
+                        android:id="@+id/recent6MonthsAvgText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="5" />
+
+                    <TextView
+                        android:id="@+id/recentYearAvgText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="6" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/TrendColumn4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueTitleText"
+                        android:text="Sum" />
+
+                    <TextView
+                        android:id="@+id/recent7DaysSumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+
+                    <TextView
+                        android:id="@+id/recent15DaysSumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="1" />
+
+                    <TextView
+                        android:id="@+id/recentMonthSumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="2" />
+
+                    <TextView
+                        android:id="@+id/recent2MonthsSumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="3" />
+
+                    <TextView
+                        android:id="@+id/recent3MonthsSumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="4" />
+
+                    <TextView
+                        android:id="@+id/recent6MonthsSumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="5" />
+
+                    <TextView
+                        android:id="@+id/recentYearSumText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/statisticItemValueText"
+                        android:text="6" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="#ff000000" />
+
+            <TextView
+                style="@style/statisticTitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:text="Summary" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="#ff000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="@dimen/stat_linear_horizontal_margin"
+                android:layout_marginRight="@dimen/stat_linear_horizontal_margin"
+                android:layout_marginTop="@dimen/stat_linear_vertical_margin"
+                android:layout_marginBottom="@dimen/stat_linear_vertical_margin">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemKeyText"
+                        android:text="Total Records" />
+
+                    <TextView
+                        android:id="@+id/summaryTotalNumText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/summaryTotalAvgLinear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemKeyText"
+                        android:text="Total Average" />
+
+                    <TextView
+                        android:id="@+id/summaryTotalAvgText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/summaryTotalSumLinear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemKeyText"
+                        android:text="Total Sum" />
+
+                    <TextView
+                        android:id="@+id/summaryTotalSumText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemKeyText"
+                        android:text="First Recorded" />
+
+                    <TextView
+                        android:id="@+id/firstRecordDateText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemKeyText"
+                        android:text="Last Recorded" />
+
+                    <TextView
+                        android:id="@+id/lastRecordDateText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemKeyText"
+                        android:text="Total Period" />
+
+                    <TextView
+                        android:id="@+id/totalPeriodText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/statisticItemValueText"
+                        android:text="0" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

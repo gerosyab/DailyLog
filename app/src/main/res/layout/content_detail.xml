@@ -8,7 +8,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.DetailActivity"
     tools:showIn="@layout/activity_detail">
 
@@ -19,9 +18,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:gravity="left"
-        android:paddingTop="10dp"
         android:textColor="@color/colorPrimary"
         android:textSize="35sp" />
 
@@ -32,10 +30,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/yearText"
         android:gravity="right"
-        android:paddingTop="10dp"
         android:textColor="@color/colorPrimary"
         android:textSize="35sp" />
 
@@ -62,5 +59,31 @@
         android:layout_below="@+id/monthText"
         android:layout_marginTop="10dp"
         android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/summaryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/todayBtn"
+        android:layout_marginBottom="7dp"
+        android:padding="5dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="Records : 1, Average : 1.5, Sum : 22"
+        android:textSize="15sp"
+        android:textColor="@color/dark_gray"
+        />
+
+    <Button
+        android:id="@+id/todayBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="5dp"
+        android:background="@drawable/go_today_btn_bg"
+        android:text="TODAY"
+        android:textSize="15sp"
+        android:textColor="@color/dark_gray"/>
 
 </RelativeLayout>

@@ -8,8 +8,23 @@
         android:title="@string/action_import"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_license"
+        android:id="@+id/action_order_category"
         android:orderInCategory="200"
+        android:title="@string/action_order"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_info"
+        android:orderInCategory="300"
+        android:title="@string/action_info"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_license"
+        android:orderInCategory="400"
         android:title="@string/action_license"
         app:showAsAction="never" />
+    <!--<item
+        android:id="@+id/action_make_test_data"
+        android:orderInCategory="500"
+        android:title="MAKE TEST DATA"
+        app:showAsAction="never" />-->
 </menu>

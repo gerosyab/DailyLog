@@ -3,6 +3,8 @@
     <string name="action_import">IMPORT</string>
     <string name="action_export">EXPORT</string>
     <string name="action_settings">SETTINGS</string>
+    <string name="action_info">INFORMATION</string>
+    <string name="action_order">ORDER CATEGORIES</string>
     <string name="action_license">LICENSE</string>
     <string name="action_save">SAVE</string>
     <string name="action_edit">EDIT</string>
@@ -23,5 +25,11 @@
     <string name="dialog_message_confirm_delete_record">Delete a record?</string>
     <string name="memoDialogTitle">Memo</string>
     <string name="send_to">Share exported file to...</string>
-    <string name="title_activity_main2">Main2Activity</string>
+
+    <string-array name="spinner_date_array">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+        <item>Year</item>
+    </string-array>
 </resources>

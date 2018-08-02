@@ -1,0 +1,13 @@
+Recent Changes
+ - Bug Fix
+  * Numeric Category's unit value bug
+  * Numeric Category's statistic value bug
+  * Numeric/Memo record edit bug (set value to 0 or empty string)
+ - Improve
+  * Displaying record type in category list
+  * Changing color of weekend in calendar
+  * Adding feature drag & sort categories
+  * Adding today button in calendar
+  * Adding month's summary information view in calendar
+  * Adding bar chart in statistics
+  * Adding periodical/total average, sum value in statistics

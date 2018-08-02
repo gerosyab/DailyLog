@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/today_selected_other_month_cell_bg_drawable_outer" />
+    <item android:drawable="@drawable/today_selected_other_month_cell_bg_drawable_middle" />
+    <item android:drawable="@drawable/today_selected_other_month_cell_bg_drawable_inner" />
+</layer-list>

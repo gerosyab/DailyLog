@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!-- Base application theme. -->
@@ -51,18 +52,40 @@
     </style>
 
     <style name="statisticTitleText">
-        <item name="android:textSize">15.0sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">#ff000000</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:padding">5.0dip</item>
     </style>
 
-    <style name="statisticItemText">
-        <item name="android:textSize">13.0sp</item>
+    <style name="statisticText">
+        <item name="android:textSize">13sp</item>
         <item name="android:textColor">#ff222222</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:padding">5.0dip</item>
+        <item name="android:layout_gravity">fill</item>
+        <item name="android:layout_margin">3dp</item>
+    </style>
+
+    <style name="statisticItemTitleText" parent="statisticText">
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="statisticItemKeyTitleText" parent="statisticText">
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="statisticItemValueTitleText" parent="statisticText">
+        <item name="android:gravity">right|center_vertical</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="statisticItemKeyText" parent="statisticText">
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="statisticItemValueText" parent="statisticText">
+        <item name="android:gravity">right|center_vertical</item>
     </style>
 
 </resources>

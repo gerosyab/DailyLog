@@ -4,15 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="90dp"
+        android:clipToPadding="false"
         android:id="@+id/listView"
-        android:divider="@null"
+        android:divider="#BBBBBB"
+        android:dividerHeight="1px"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>
