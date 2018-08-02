@@ -13,13 +13,18 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
@@ -34,6 +39,8 @@ import net.gerosyab.dailylog.data.Category;
 import net.gerosyab.dailylog.data.Record;
 import net.gerosyab.dailylog.data.StaticData;
 import net.gerosyab.dailylog.database.AppDatabase;
+import net.gerosyab.dailylog.util.MyLog;
+import net.gerosyab.dailylog.util.Util;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.joda.time.DateTime;
@@ -52,18 +59,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
 public class MainActivity extends SuperActivity {
 
-//    private static List<Category> categories;
+    private static final String LOG_TAG = "MainActivity";
     private static RealmResults<Category> categories;
     ListView listView;
-    ArrayAdapter<String> adapter;
+    MyListAdapter adapter;
+
     final static int REQUEST_CODE_CATEGORY_ACTIVITY_CREATE = 123;
     final static int REQUEST_CODE_CATEGORY_ACTIVITY_EDIT = 456;
+    final static int REQUEST_CODE_CATEGORY_LIST_SORT = 789;
     FilePickerDialog dialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +82,9 @@ public class MainActivity extends SuperActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         listView = (ListView) findViewById(R.id.listView);
-        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.simple_list_item_1);
+
+        categories = Category.getCategories(realm);
+        adapter = new MyListAdapter(categories);
         listView.setAdapter(adapter);
         registerForContextMenu(listView);
 
@@ -89,7 +101,7 @@ public class MainActivity extends SuperActivity {
 
         toolbar.setNavigationIcon(R.drawable.ic_home_white_24dp);
 
-        refreshList();
+//        refreshList();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -99,14 +111,48 @@ public class MainActivity extends SuperActivity {
                 addCategory();
             }
         });
+
+    }
+
+    public class MyListAdapter extends RealmBaseAdapter<Category> implements ListAdapter {
+
+        private class ViewHolder {
+            TextView categoryTypeText;
+            TextView categoryNameText;
+        }
+
+        MyListAdapter(OrderedRealmCollection<Category> realmResults) {
+            super(realmResults);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.simple_list_item_1, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.categoryTypeText = (TextView) convertView.findViewById(R.id.type_text);
+                viewHolder.categoryNameText = (TextView) convertView.findViewById(R.id.title_text);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            if (adapterData != null) {
+                final Category category = adapterData.get(position);
+                viewHolder.categoryNameText.setText(category.getName());
+                viewHolder.categoryTypeText.setText(StaticData.RECORD_TYPE_NAME[(int) category.getRecordType()]);
+            }
+            return convertView;
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE_CATEGORY_ACTIVITY_CREATE || requestCode == REQUEST_CODE_CATEGORY_ACTIVITY_EDIT){
+        if(requestCode == REQUEST_CODE_CATEGORY_ACTIVITY_CREATE || requestCode == REQUEST_CODE_CATEGORY_ACTIVITY_EDIT || requestCode == REQUEST_CODE_CATEGORY_LIST_SORT){
             if(resultCode == RESULT_OK){
-                refreshList();
+                adapter.notifyDataSetChanged();
             }
         }
     }
@@ -127,7 +173,13 @@ public class MainActivity extends SuperActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_license) {
-            Intent intent = new Intent(getApplicationContext(), LicenseActivity.class);
+            Intent intent = new Intent(getApplicationContext(), RawTextViewActivity.class);
+            intent.putExtra(StaticData.RAW_TEXT_INTENT_EXTRA, RawTextViewActivity.LICENSE);
+            startActivity(intent);
+        }
+        else if (id == R.id.action_info) {
+            Intent intent = new Intent(getApplicationContext(), RawTextViewActivity.class);
+            intent.putExtra(StaticData.RAW_TEXT_INTENT_EXTRA, RawTextViewActivity.INFORMATION);
             startActivity(intent);
         }
         else if (id == R.id.action_import){
@@ -135,6 +187,56 @@ public class MainActivity extends SuperActivity {
             //선택된 파일을 검사 후 형식이 정상적이면 새로운 카테고리 생성해 db 에 저장
             importCategory();
         }
+        else if (id == R.id.action_order_category){
+            //카테고리 정렬 액티비티 호출
+            Intent intent = new Intent(context, CategoryListSortActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_CATEGORY_LIST_SORT);
+        }
+        /* else if (id == R.id.action_make_test_data){
+            // 카테고리 소팅용 테스트 데이터 생성
+            for(Category category : categories){
+                category.deleteCategory(realm);
+            }
+            String[] names = {"A", "B", "C", "D", "E", "F"};
+            for(int i = 0; i < names.length; i++) {
+                realm.beginTransaction();
+                Category category = realm.createObject(Category.class, UUID.randomUUID().toString());
+                category.setName(names[i]);
+                category.setUnit("a");
+
+                category.setDefaultValue(0);
+                category.setRecordType(StaticData.RECORD_TYPE_BOOLEAN);
+                category.setOrder(i);
+                realm.insertOrUpdate(category);
+                realm.commitTransaction();
+            }
+            String cateUUID = UUID.randomUUID().toString();
+            realm.beginTransaction();
+            Category category = realm.createObject(Category.class, cateUUID);
+            category.setName("NUM");
+            category.setUnit("a");
+            category.setDefaultValue(1);
+            category.setRecordType(StaticData.RECORD_TYPE_NUMBER);
+            category.setOrder(6);
+            realm.insertOrUpdate(category);
+            realm.commitTransaction();
+
+            realm.beginTransaction();
+            DateTime dateTime = DateTime.now();
+
+
+            for(int i = 0; i < 10000; i++){
+                DateTime dt = dateTime.withTimeAtStartOfDay().minusDays(i);
+                Record record = new Record();
+                record = realm.createObject(Record.class, UUID.randomUUID().toString());
+                record.setCategoryId(cateUUID);
+                record.setRecordType(StaticData.RECORD_TYPE_NUMBER);
+                record.setNumber((long) Math.random() * 10);
+                record.setDate(new java.sql.Date(dt.toDate().getTime()));
+            }
+            realm.commitTransaction();
+            adapter.notifyDataSetChanged();
+        } */
 
         return super.onOptionsItemSelected(item);
     }
@@ -142,6 +244,7 @@ public class MainActivity extends SuperActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        MyLog.d(LOG_TAG, "onCreateContextMenu() - menuInfo : " + menuInfo.toString());
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_context, menu);
     }
@@ -149,6 +252,7 @@ public class MainActivity extends SuperActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        MyLog.d(LOG_TAG, "onContextItemSelected() - item : " + item.toString());
         switch (item.getItemId()) {
             case R.id.action_edit:
                 editCategory(info.id);
@@ -165,30 +269,9 @@ public class MainActivity extends SuperActivity {
 
     }
 
-
-    private void refreshList(){
-//        if(realm == null) realm = getRealm();
-        categories = Category.getCategories(realm);
-
-        adapter.clear();
-
-        for (Category category : categories){
-            adapter.add(category.getName());
-        }
-        adapter.notifyDataSetChanged();
-    }
-
     private void addCategory(){
         Intent intent = new Intent(getApplicationContext(), CategoryActivity.class);
         intent.putExtra(StaticData.CATEGORY_MODE_INTENT_EXTRA, StaticData.CATEGORY_MODE_CREATE);
-        long order;
-        if(categories == null || categories.size() == 0){
-            order = 0;
-        }
-        else{
-            order = categories.size() + 1;
-        }
-        intent.putExtra(StaticData.CATEGORY_ORDER_INTENT_EXTRA, order);
         startActivityForResult(intent, REQUEST_CODE_CATEGORY_ACTIVITY_CREATE);
     }
 
@@ -205,9 +288,8 @@ public class MainActivity extends SuperActivity {
         .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Category category = categories.get((int)id);
-                category.deleteCategory(realm);
-                refreshList();
+                categories.get((int) id).deleteCategory(realm);
+                adapter.notifyDataSetChanged();
             }
         })
         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -337,15 +419,15 @@ public class MainActivity extends SuperActivity {
                         for (int i = 0; i < nextLine.length; i++) {
                             temp2 += nextLine[i] + ", ";
                         }
-                        Log.d("opencsv", temp2);
+                        MyLog.d("opencsv", temp2);
 
                         if(lineNum == 0){
                             //header
-                            Log.d("opencsv", "nextLine.length : " + nextLine.length);
+                            MyLog.d("opencsv", "nextLine.length : " + nextLine.length);
                             for (int i = 0; i < nextLine.length; i++) {
                                 String[] split2 = nextLine[i].split(":");
-                                Log.d("opencsv", "split2.length : " + split2.length);
-                                Log.d("opencsv", "split2[0] : " + split2[0]);
+                                MyLog.d("opencsv", "split2.length : " + split2.length);
+                                MyLog.d("opencsv", "split2[0] : " + split2[0]);
                                 if(split2[0].replaceAll("\\s+","").equals("Version")){
                                     if(split2[1] != null && !split2[1].equals("")){
                                         dbVersion = split2[1];
@@ -382,7 +464,7 @@ public class MainActivity extends SuperActivity {
                                     }else if(split2[1] != null && !split2[1].equals("")){
                                         if(NumberUtils.isDigits(split2[1]) && NumberUtils.isNumber(split2[1])){
                                             defaultValue = Long.parseLong(split2[1]);
-                                            Log.d("opencsv", "split2[1] : " + split2[1]);
+                                            MyLog.d("opencsv", "split2[1] : " + split2[1]);
                                             if(defaultValue >= 0){
                                                 defaultValueCheck = true;
                                             }
@@ -484,21 +566,30 @@ public class MainActivity extends SuperActivity {
                         Toast.makeText(context, "Data file's record data is not correct", Toast.LENGTH_LONG).show();
                     }
                     else{
+                        long newOrder = Category.getNewOrderNum(realm);
                         realm.beginTransaction();
                         Category category = realm.createObject(Category.class, newCategoryUUID);
                         category.setName(categoryName);
                         category.setUnit(categoryUnit);
-                        category.setOrder(Category.getLastOrderNum(realm));
+                        category.setOrder(newOrder);
                         category.setRecordType(categoryType);
                         realm.insert(category);
                         realm.insertOrUpdate(records);
                         realm.commitTransaction();
                         Toast.makeText(context, "Data import [ " + categoryName + " ] is completed!!", Toast.LENGTH_LONG).show();
-                        refreshList();
+//                        refreshList();
+//                        categoryHolderList.add(getHolderFromCategory(category));
+//                        mDragListView.getAdapter().notifyDataSetChanged();
+//                        mDragListView.getAdapter().notifyItemInserted((int) newOrder);
+//                        setCategoryHolderList();
+//                        mDragListView.getAdapter().setItemList(categoryHolderList);
+                        adapter.notifyDataSetChanged();
                     }
                 } catch (FileNotFoundException e) {
+                    Toast.makeText(context, "Selected file is not found", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 } catch (IOException e) {
+                    Toast.makeText(context, "File I/O exception occured", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 } finally {
                     progressDialog.dismiss();
@@ -525,5 +616,7 @@ public class MainActivity extends SuperActivity {
             }
         }
     }
+
+
 
 }
