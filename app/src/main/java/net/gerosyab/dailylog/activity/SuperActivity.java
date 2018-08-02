@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+
+import net.gerosyab.dailylog.util.MyLog;
 
 import io.realm.Realm;
 
@@ -34,6 +37,7 @@ public class SuperActivity extends AppCompatActivity {
         if (realm == null || realm.isClosed()) {
             try {
                 realm = Realm.getDefaultInstance();
+                MyLog.d("dailylog", "realm.getPath() : " + realm.getPath());
             } catch (IllegalStateException e) {
                 if (e.getMessage().contains("Call `Realm.init(Context)` before creating a RealmConfiguration")) {
                     Realm.init(getApplicationContext());
