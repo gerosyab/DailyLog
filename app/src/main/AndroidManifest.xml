@@ -65,7 +65,18 @@
                 android:value=".activity.CategoryActivity" />
         </activity>
         <activity
-            android:name=".activity.LicenseActivity"
+            android:name=".activity.RawTextViewActivity"
+            android:parentActivityName=".activity.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.CategoryListSortActivity"
             android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
